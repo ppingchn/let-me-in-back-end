@@ -1,18 +1,18 @@
 const createError = require("../utils/createError");
-exports.createReply = async () => {
+exports.createReply = async (req, res, next) => {
   try {
   } catch (error) {
     next(error);
   }
 };
 
-exports.updateReply = async () => {
+exports.updateReply = async (req, res, next) => {
   try {
   } catch (error) {
     next(error);
   }
 };
-exports.deleteReply = async () => {
+exports.deleteReply = async (req, res, next) => {
   try {
   } catch (error) {
     next(error);
