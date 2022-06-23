@@ -3,8 +3,14 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
+//internal import
+const { sequelize } = require('./models');
+
 // using module
 const app = express();
+
+// DataBase Create
+// sequelize.sync({ alert: true });
 
 // middleware
 app.use(cors());
