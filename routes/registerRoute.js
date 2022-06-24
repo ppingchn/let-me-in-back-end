@@ -7,7 +7,7 @@ const upload = require("../middlewares/upload");
 router.post(
   "/",
   upload.fields([
-    { name: "profilePic", maxCount: 5 },
+    { name: "profilePic", maxCount: 1 },
     { name: "coverPic", maxCount: 1 },
   ]),
   authController.register

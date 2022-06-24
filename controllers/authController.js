@@ -22,9 +22,9 @@ const createToken = (payload) =>
 
 exports.login = async (req, res, next) => {
   try {
-    const { userName, password } = req.body;
+    const { username, password } = req.body;
     const user = await User.findOne({
-      where: { userName },
+      where: { username },
     });
 
     if (!user) {
@@ -84,6 +84,7 @@ exports.register = async (req, res, next) => {
         createError("password did not match", 400);
       }
 
+      // Make sure they gave use a valid phone number
       const isPhoneNumber = validator.isMobilePhone(phoneNumber + "");
       if (!isPhoneNumber) {
         createError("Invalid phone number", 400);
@@ -164,19 +165,5 @@ exports.register = async (req, res, next) => {
     if (req.files?.coverPic) {
       fs.unlinkSync(req.files.coverPic[0].path);
     }
-  }
-};
-
-exports.companyRegister = async (req, res, next) => {
-  try {
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.userRegister = async (req, res, next) => {
-  try {
-  } catch (err) {
-    next(err);
   }
 };
