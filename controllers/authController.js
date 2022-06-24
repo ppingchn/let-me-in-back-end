@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const createError = require("../util/createError");
-const { User } = require("../models");
+const { User, Education, Skill, Experience } = require("../models");
 const { sequelize } = require("../models");
 const fs = require("fs");
 const cloudinary = require("../util/cloundinary");
@@ -38,56 +38,114 @@ exports.login = async (req, res, next) => {
 };
 
 exports.register = async (req, res, next) => {
-  // const t = await sequelize.transaction();
-  console.log("register");
   try {
-    const { username, password, confirmPassword, role, email, phoneNumber } =
-      req.body;
-    console.log(username);
-    console.log(phoneNumber);
+    const result = await sequelize.transaction(async (t) => {
+      const {
+        username,
+        password,
+        confirmPassword,
+        role,
+        email,
+        phoneNumber,
+        educationArray,
+        experienceArray,
+        skillArray,
+      } = req.body;
 
-    const stockPic = {};
+      const stockPic = {};
 
-    if (req.files?.profilePic) {
-      const result = await cloudinary.upload(req.files.profilePic[0].path);
-      stockPic.profilePic = result.secure_url;
-    }
-    if (req.files?.coverPic) {
-      const result = await cloudinary.upload(req.files.coverPic[0].path);
-      stockPic.coverPic = result.secure_url;
-    }
+      if (req.files?.profilePic) {
+        const result = await cloudinary.upload(req.files.profilePic[0].path);
+        stockPic.profilePic = result.secure_url;
+      }
+      if (req.files?.coverPic) {
+        const result = await cloudinary.upload(req.files.coverPic[0].path);
+        stockPic.coverPic = result.secure_url;
+      }
 
-    if (!phoneNumber) {
-      createError("phone number is require", 400);
-    }
-    if (!password) {
-      createError("password is require", 400);
-    }
-    if (password !== confirmPassword) {
-      createError("password did not match", 400);
-    }
+      if (!phoneNumber) {
+        createError("phone number is require", 400);
+      }
+      if (!password) {
+        createError("password is require", 400);
+      }
+      if (password !== confirmPassword) {
+        createError("password did not match", 400);
+      }
 
-    const isPhoneNumber = validator.isMobilePhone(phoneNumber + "");
-    if (!isPhoneNumber) {
-      createError("Invalid phone number", 400);
-    }
+      const isPhoneNumber = validator.isMobilePhone(phoneNumber + "");
+      if (!isPhoneNumber) {
+        createError("Invalid phone number", 400);
+      }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
-    const user = await User.create({
-      username,
-      profilePic: stockPic.profilePic,
-      coverPic: stockPic.coverPic,
+      const hashedPassword = await bcrypt.hash(password, 12);
 
-      role,
-      email,
-      phoneNumber,
-      password: hashedPassword,
+      if (role === "user" || role === "company") {
+        const user = await User.create({
+          username,
+          profilePic: stockPic.profilePic,
+          coverPic: stockPic.coverPic,
+
+          role,
+          email,
+          phoneNumber,
+          password: hashedPassword,
+        });
+
+        //create Education
+        if (role === "user") {
+          const eduArray = JSON.parse(educationArray);
+
+          eduArray.map(
+            async (el) =>
+              await Education.create({
+                userId: user.id,
+                degree: el.degree,
+                university: el.university,
+                field: el.field,
+                yearStart: el.yearStart,
+                yearEnd: el.yearEnd,
+              })
+          );
+
+          const experience = JSON.parse(experienceArray);
+
+          experience.map(
+            async (el) =>
+              await Experience.create({
+                companyName: el.companyName,
+                position: el.position,
+                yearStart: el.yearStart,
+                yearEnd: el.yearEnd,
+                userId: user.id,
+              })
+          );
+
+          const skill = JSON.parse(skillArray);
+
+          skill.map(
+            async (el) =>
+              await Skill.create({
+                title: el.title,
+                userId: user.id,
+              })
+          );
+        }
+        //else if (role === "company") {
+        //   await CommpanyDetail.create({
+        //     companyName,
+        //     websiteLink,
+        //     overView,
+        //     address,
+        //     location,
+        //     userId: user.id,
+        //   });
+        // }
+      }
     });
-    // await t.commit();
-    const token = createToken({ id: user.id });
+    const token = createToken({ id: User.id });
     res.status(201).json({ token });
   } catch (err) {
-    // await t.rollback();
     next(err);
   } finally {
     if (req.files?.profilePic) {
@@ -98,6 +156,7 @@ exports.register = async (req, res, next) => {
     }
   }
 };
+
 exports.companyRegister = async (req, res, next) => {
   try {
   } catch (err) {
