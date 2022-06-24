@@ -1,10 +1,10 @@
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-const createError = require("../utils/createError");
-const { User } = require("../models");
-const sequelize = require("sequelize");
+const createError = require('../util/createError');
+const { User } = require('../models');
+const sequelize = require('sequelize');
 
 //CREATE TOKEN
 const createToken = (payload) =>
@@ -20,12 +20,12 @@ exports.login = async (req, res, next) => {
     });
 
     if (!user) {
-      createError("Invalid credential", 400);
+      createError('Invalid credential', 400);
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      createError("Invalid credential", 400);
+      createError('Invalid credential', 400);
     }
 
     const token = createToken({ id: user.id });
@@ -40,18 +40,18 @@ exports.register = async (req, res, next) => {
     const { userName, phoneNumber, password, confirmPassword } = req.body;
 
     if (!phoneNumber) {
-      createError("phone number is require", 400);
+      createError('phone number is require', 400);
     }
     if (!password) {
-      createError("password is require", 400);
+      createError('password is require', 400);
     }
     if (password !== confirmPassword) {
-      createError("password did not match", 400);
+      createError('password did not match', 400);
     }
 
-    const isPhoneNumber = validator.isMobilePhone(phoneNumber + "");
+    const isPhoneNumber = validator.isMobilePhone(phoneNumber + '');
     if (!isPhoneNumber) {
-      createError("Invalid phone number", 400);
+      createError('Invalid phone number', 400);
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
