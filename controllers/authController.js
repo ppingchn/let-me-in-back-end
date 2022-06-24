@@ -3,7 +3,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const createError = require("../util/createError");
-const { User, Education, Skill, Experience } = require("../models");
+const {
+  User,
+  Education,
+  Skill,
+  Experience,
+  CompanyDetail,
+} = require("../models");
 const { sequelize } = require("../models");
 const fs = require("fs");
 const cloudinary = require("../util/cloundinary");
@@ -50,6 +56,11 @@ exports.register = async (req, res, next) => {
         educationArray,
         experienceArray,
         skillArray,
+        companyName,
+        websiteLink,
+        overView,
+        address,
+        location,
       } = req.body;
 
       const stockPic = {};
@@ -130,17 +141,16 @@ exports.register = async (req, res, next) => {
                 userId: user.id,
               })
           );
+        } else if (role === "company") {
+          await CompanyDetail.create({
+            companyName,
+            websiteLink,
+            overView,
+            address,
+            location,
+            userId: user.id,
+          });
         }
-        //else if (role === "company") {
-        //   await CommpanyDetail.create({
-        //     companyName,
-        //     websiteLink,
-        //     overView,
-        //     address,
-        //     location,
-        //     userId: user.id,
-        //   });
-        // }
       }
     });
     const token = createToken({ id: User.id });
