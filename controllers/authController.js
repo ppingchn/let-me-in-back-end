@@ -97,7 +97,6 @@ exports.register = async (req, res, next) => {
           username,
           profilePic: stockPic.profilePic,
           coverPic: stockPic.coverPic,
-
           role,
           email,
           phoneNumber,
