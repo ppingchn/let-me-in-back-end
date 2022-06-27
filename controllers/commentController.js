@@ -1,10 +1,10 @@
+const createError = require('../util/createError');
 const { Comment } = require('../models');
-const createError = require('../utils/createError');
-
 exports.createComment = async (req, res, next) => {
+  console.log(req.params);
   try {
-    const { title } = req.body;
-    const { postId } = req.params;
+    const { title, postId } = req.body;
+
     const comment = await Comment.create({
       title,
       postId,
@@ -18,14 +18,19 @@ exports.createComment = async (req, res, next) => {
 
 exports.updateComment = async (req, res, next) => {
   try {
-    const { title } = req.body;
-    const { commentId, postId } = req.params;
+    const { title, postId } = req.body;
+    const { commentId } = req.params;
+
     const comment = await Comment.findOne({ where: { id: commentId }, postId });
     if (!comment) {
       createError('Commment not found', 404);
     }
-    bodyUpdate = { title };
-    await comment.save(bodyUpdate);
+
+    if (comment.userId !== req.user.id) {
+      createError('you have no permission', 403);
+    }
+    comment.title = title;
+    await comment.save();
     res.json({ comment });
   } catch (error) {
     next(error);
@@ -33,8 +38,8 @@ exports.updateComment = async (req, res, next) => {
 };
 exports.deleteComment = async (req, res, next) => {
   try {
-    const { commentId, postId } = req.params;
-    const comment = await Comment.findOne({ where: { id: commentId }, postId });
+    const { commentId } = req.params;
+    const comment = await Comment.findOne({ where: { id: commentId } });
     if (!comment) {
       createError('Comment not found', 404);
     }

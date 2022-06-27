@@ -12,7 +12,7 @@ module.exports = async (req, res, next) => {
     if (!token) {
       createError('You are unauthorized', 401);
     }
-    const payloadDetail = jwt.verify(token, process.env.SECRET_KEY);
+    const payloadDetail = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const user = await User.findOne({
       where: { id: payloadDetail.id },
     });
