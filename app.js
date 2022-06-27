@@ -1,15 +1,16 @@
 // Libary import
-require("dotenv").config();
-const express = require("express");
+require('dotenv').config();
+const express = require('express');
 
-const cors = require("cors");
+const cors = require('cors');
 
-const { sequelize } = require("./models/index");
+const { sequelize } = require('./models/index');
+// sequelize.sync({ force: true });
 // sequelize.sync({ alter: true });
 
 //import route
-const registerRoute = require("./routes/registerRoute");
-const loginRoute = require("./routes/loginRout");
+const registerRoute = require('./routes/registerRoute');
+const loginRoute = require('./routes/loginRout');
 
 const app = express();
 
@@ -19,8 +20,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 //login and register
-app.use("/login", loginRoute);
-app.use("/register", registerRoute);
+app.use('/login', loginRoute);
+app.use('/register', registerRoute);
 
 app.listen(process.env.PORT, () => {
   console.log(`This server running on PORT ${process.env.PORT}`);

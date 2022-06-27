@@ -105,7 +105,7 @@ exports.register = async (req, res, next) => {
 
         //create Education
         if (role === 'user') {
-          const eduArray = JSON.parse(educationArray);
+          const eduArray = Object.values(JSON.parse(educationArray));
 
           eduArray.map(
             async (el) =>
@@ -114,22 +114,22 @@ exports.register = async (req, res, next) => {
                 degree: el.degree,
                 university: el.university,
                 field: el.field,
-                yearStart: el.yearStart,
-                yearEnd: el.yearEnd,
-              })
+                yearStart: el.startDateEducation,
+                yearEnd: el.endDateEducation,
+              }),
           );
 
-          const experience = JSON.parse(experienceArray);
+          const experience = Object.values(JSON.parse(experienceArray));
 
           experience.map(
             async (el) =>
               await Experience.create({
                 companyName: el.companyName,
                 position: el.position,
-                yearStart: el.yearStart,
-                yearEnd: el.yearEnd,
+                yearStart: el.startDate,
+                yearEnd: el.endDate,
                 userId: user.id,
-              })
+              }),
           );
 
           const skill = JSON.parse(skillArray);
@@ -139,7 +139,7 @@ exports.register = async (req, res, next) => {
               await Skill.create({
                 title: el.title,
                 userId: user.id,
-              })
+              }),
           );
         } else if (role === 'company') {
           await CompanyDetail.create({
