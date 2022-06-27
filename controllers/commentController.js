@@ -1,7 +1,6 @@
 const createError = require('../util/createError');
 const { Comment } = require('../models');
 exports.createComment = async (req, res, next) => {
-  console.log(req.params);
   try {
     const { title, postId } = req.body;
 
