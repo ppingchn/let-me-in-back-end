@@ -1,18 +1,18 @@
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-const createError = require("../util/createError");
+const createError = require('../util/createError');
 const {
   User,
   Education,
   Skill,
   Experience,
   CompanyDetail,
-} = require("../models");
-const { sequelize } = require("../models");
-const fs = require("fs");
-const cloudinary = require("../util/cloundinary");
+} = require('../models');
+const { sequelize } = require('../models');
+const fs = require('fs');
+const cloudinary = require('../util/cloundinary');
 
 //CREATE TOKEN
 const createToken = (payload) =>
@@ -28,12 +28,12 @@ exports.login = async (req, res, next) => {
     });
 
     if (!user) {
-      createError("Invalid credential", 400);
+      createError('Invalid credential', 400);
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      createError("Invalid credential", 400);
+      createError('Invalid credential', 400);
     }
 
     const token = createToken({ id: user.id });
@@ -75,6 +75,7 @@ exports.register = async (req, res, next) => {
       }
 
       if (!phoneNumber) {
+<<<<<<< HEAD
         createError("phone number is require", 400);
       }
       if (!password) {
@@ -88,16 +89,38 @@ exports.register = async (req, res, next) => {
       const isPhoneNumber = validator.isMobilePhone(phoneNumber + "");
       if (!isPhoneNumber) {
         createError("Invalid phone number", 400);
+=======
+        createError('phone number is require', 400);
+      }
+      if (!password) {
+        createError('password is require', 400);
+      }
+      if (password !== confirmPassword) {
+        createError('password did not match', 400);
+      }
+
+      // Make sure they gave use a valid phone number
+      const isPhoneNumber = validator.isMobilePhone(phoneNumber + '');
+      if (!isPhoneNumber) {
+        createError('Invalid phone number', 400);
+>>>>>>> dev
       }
 
       const hashedPassword = await bcrypt.hash(password, 12);
 
+<<<<<<< HEAD
       if (role === "user" || role === "company") {
+=======
+      if (role === 'user' || role === 'company') {
+>>>>>>> dev
         const user = await User.create({
           username,
           profilePic: stockPic.profilePic,
           coverPic: stockPic.coverPic,
+<<<<<<< HEAD
 
+=======
+>>>>>>> dev
           role,
           email,
           phoneNumber,
@@ -105,7 +128,11 @@ exports.register = async (req, res, next) => {
         });
 
         //create Education
+<<<<<<< HEAD
         if (role === "user") {
+=======
+        if (role === 'user') {
+>>>>>>> dev
           const eduArray = JSON.parse(educationArray);
 
           eduArray.map(
@@ -142,7 +169,11 @@ exports.register = async (req, res, next) => {
                 userId: user.id,
               })
           );
+<<<<<<< HEAD
         } else if (role === "company") {
+=======
+        } else if (role === 'company') {
+>>>>>>> dev
           await CompanyDetail.create({
             companyName,
             websiteLink,
@@ -154,7 +185,11 @@ exports.register = async (req, res, next) => {
         }
       }
     });
+<<<<<<< HEAD
     const token = createToken({ id: user.id });
+=======
+    const token = createToken({ id: User.id });
+>>>>>>> dev
     res.status(201).json({ token });
   } catch (err) {
     next(err);
