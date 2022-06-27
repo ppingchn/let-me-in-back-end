@@ -13,6 +13,7 @@ const loginRoute = require('./routes/loginRout');
 const postRoute = require('./routes/postRoute');
 const postPicRoute = require('./routes/postPicRoute');
 const commentRoute = require('./routes/commentRoute');
+const likeRout = require('./routes/likeRoute');
 
 const app = express();
 
@@ -33,6 +34,9 @@ app.use('/postPic', postPicRoute);
 
 //comment
 app.use('/comment', commentRoute);
+
+//like post
+app.use('/like', likeRout);
 
 app.listen(process.env.PORT, () => {
   console.log(`This server running on PORT ${process.env.PORT}`);
