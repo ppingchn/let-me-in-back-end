@@ -22,7 +22,7 @@ const createToken = (payload) =>
 
 exports.login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
     const user = await User.findOne({
       where: { username: username },
     });
