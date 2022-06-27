@@ -13,7 +13,7 @@ exports.createLike = async (req, res, next) => {
     }
     const post = await Post.findOne({ where: { id: postId } });
     if (!post) {
-      createError('post not found', 400);
+      createError('post not found', 404);
     }
     const likes = await LikePost.create(
       { postId, userId: req.user.id },
@@ -28,7 +28,6 @@ exports.createLike = async (req, res, next) => {
 };
 
 exports.deleteLike = async (req, res, next) => {
-  console.log('haha');
   const t = await sequelize.transaction();
   try {
     const { postId } = req.params;

@@ -7,6 +7,11 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
+    likes: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
   });
   Comment.associate = (models) => {
     Comment.hasMany(models.LikeComment, {

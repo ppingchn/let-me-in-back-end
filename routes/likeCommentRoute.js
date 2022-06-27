@@ -1,10 +1,15 @@
-const express = require("express");
+const express = require('express');
 
 const router = express.Router();
-const likeCommentController = require("../controllers/likeCommentController");
+const likeCommentController = require('../controllers/likeCommentController');
+const authenticate = require('../middlewares/authenticate');
 
-router.post("/", likeCommentController.createLikeComment);
-router.put("/likeCommentId", likeCommentController.updateLikeComment);
-router.delete("/likeCommentId", likeCommentController.deleteLikeComment);
+router.post('/', authenticate, likeCommentController.createLikeComment);
+
+router.delete(
+  '/comment/:commentId/likesComment/:likeCommentId',
+  authenticate,
+  likeCommentController.deleteLikeComment,
+);
 
 module.exports = router;
