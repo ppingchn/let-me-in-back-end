@@ -1,10 +1,11 @@
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
-    'User',
+    "User",
     {
       username: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
         validate: {
           notEmpty: true,
         },
@@ -18,8 +19,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       profilePic: DataTypes.STRING,
       coverPic: DataTypes.STRING,
-      role: DataTypes.ENUM(['user', 'company']),
-      email: DataTypes.STRING,
+      role: DataTypes.ENUM(["user", "company"]),
+      email: { type: DataTypes.STRING, unique: true },
       phoneNumber: DataTypes.STRING,
     },
     {
@@ -29,171 +30,171 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = (models) => {
     User.hasMany(models.Education, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.Experience, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.Skill, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.UserDetail, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.CompanyDetail, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.JobList, {
       foreignKey: {
-        name: 'companyId',
+        name: "companyId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.JobApply, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.Follow, {
-      as: 'Company',
+      as: "Company",
       foreignKey: {
-        name: 'companyId',
+        name: "companyId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.Follow, {
-      as: 'Employee',
+      as: "Employee",
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.Friend, {
-      as: 'RequestTo',
+      as: "RequestTo",
       foreignKey: {
-        name: 'requestToId',
+        name: "requestToId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.Friend, {
-      as: 'RequestFrom',
+      as: "RequestFrom",
       foreignKey: {
-        name: 'requestFromId',
+        name: "requestFromId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.ChatRoom, {
-      as: 'FirstUser',
+      as: "FirstUser",
       foreignKey: {
-        name: 'firstUserId',
+        name: "firstUserId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.ChatRoom, {
-      as: 'SecondUser',
+      as: "SecondUser",
       foreignKey: {
-        name: 'secondUserId',
+        name: "secondUserId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.ChatMessage, {
-      as: 'Sender',
+      as: "Sender",
       foreignKey: {
-        name: 'senderId',
+        name: "senderId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.ChatMessage, {
-      as: 'Receive',
+      as: "Receive",
       foreignKey: {
-        name: 'receiverId',
+        name: "receiverId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.LikeComment, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.Comment, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.Reply, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.Post, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
     User.hasMany(models.LikePost, {
       foreignKey: {
-        name: 'userId',
+        name: "userId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
   };
   return User;

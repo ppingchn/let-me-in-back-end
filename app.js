@@ -10,6 +10,9 @@ const { sequelize } = require("./models/index");
 //import route
 const registerRoute = require("./routes/registerRoute");
 const loginRoute = require("./routes/loginRout");
+const postRoute = require("./routes/postRoute");
+const postPicRoute = require("./routes/postPicRoute");
+const forgotPassswordRoute = require("./routes/forgotPasswordRoute");
 
 const app = express();
 
@@ -21,6 +24,15 @@ app.use(express.urlencoded({ extended: false }));
 //login and register
 app.use("/login", loginRoute);
 app.use("/register", registerRoute);
+
+//forgot Password
+// app.use("/forgotPasssword", forgotPassswordRoute);
+
+//post
+app.use("/post", postRoute);
+
+//postPic
+app.use("/postPic", postPicRoute);
 
 app.listen(process.env.PORT, () => {
   console.log(`This server running on PORT ${process.env.PORT}`);

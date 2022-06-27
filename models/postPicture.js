@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const PostPicture = sequelize.define('PostPicture', {
+  const PostPicture = sequelize.define("PostPicture", {
     postPic: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -8,11 +8,19 @@ module.exports = (sequelize, DataTypes) => {
   PostPicture.associate = (models) => {
     PostPicture.belongsTo(models.Post, {
       foreignKey: {
-        name: 'postId',
+        name: "postId",
         allowNull: false,
       },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    PostPicture.belongsTo(models.User, {
+      foreignKey: {
+        name: "userId",
+        allowNull: false,
+      },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     });
   };
   return PostPicture;

@@ -154,7 +154,7 @@ exports.register = async (req, res, next) => {
         }
       }
     });
-    const token = createToken({ id: User.id });
+    const token = createToken({ id: user.id });
     res.status(201).json({ token });
   } catch (err) {
     next(err);
