@@ -150,8 +150,8 @@ exports.register = async (req, res, next) => {
         });
 
         //create Education
-        console.log('/n/n/n/n =============');
-        console.log(firstName, lastName, birthDate, gender, user.id);
+        // console.log('/n/n/n/n =============');
+        // console.log(firstName, lastName, birthDate, gender, user.id);
         if (role === 'user') {
           await UserDetail.create({
             firstName,
@@ -215,10 +215,10 @@ exports.register = async (req, res, next) => {
             userId: user.id,
           });
         }
+        const token = createToken({ id: user.id });
+        res.status(201).json({ token });
       }
     });
-    const token = createToken({ id: User.id });
-    res.status(201).json({ token });
   } catch (err) {
     next(err);
   } finally {
