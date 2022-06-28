@@ -1,5 +1,5 @@
 const express = require("express");
-const createErroror = require("../utils/createerroror");
+const createError = require("../utils/createError");
 exports.createFriends = async (req, res, next) => {
   try {
     const { requestToId, requestFromId, status } = req.body;
