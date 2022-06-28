@@ -119,6 +119,8 @@ exports.register = async (req, res, next) => {
           });
 
           const eduArray = Object.values(JSON.parse(educationArray));
+          // console.log(eduArray);
+          // console.log(typeof eduArray);
 
           eduArray.map(
             async (el) =>
@@ -133,6 +135,8 @@ exports.register = async (req, res, next) => {
           );
 
           const experience = Object.values(JSON.parse(experienceArray));
+          // console.log(experience);
+          // console.log(typeof experience);
 
           experience.map(
             async (el) =>
@@ -146,6 +150,8 @@ exports.register = async (req, res, next) => {
           );
 
           const skill = Object.values(JSON.parse(skillArray));
+          // console.log(skill);
+          // console.log(typeof skill);
 
           skill.map(
             async (el) =>
