@@ -18,5 +18,10 @@ router.put(
   postController.updatePost,
 );
 router.delete('/:postId', authenticate, postController.deletePost);
-router.delete('/:postPicId', authenticate, postController.deletePost);
+
+router.delete(
+  '/:postId/postPic:postPicId',
+  authenticate,
+  postController.deletePost,
+);
 module.exports = router;

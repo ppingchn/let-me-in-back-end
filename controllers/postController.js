@@ -71,7 +71,6 @@ exports.updatePost = async (req, res, next) => {
         }
       }
 
-      console.log(picArray);
       if (!detail) {
         createError('detail is required', 400);
       }
@@ -120,11 +119,10 @@ exports.updatePost = async (req, res, next) => {
   }
 };
 exports.deletePost = async (req, res, next) => {
-  let t;
   try {
     t = await sequelize.transaction();
-    const { postId } = req.params;
-    const { postPicId } = req.body;
+    const { postId, postPicId } = req.params;
+
     const post = await Post.findOne({ where: { id: postId } });
     const postPic = await PostPicture.fineOne({ where: { id: postPicId } });
     if (!post) {
@@ -170,71 +168,71 @@ exports.deletePost = async (req, res, next) => {
   }
 };
 
-exports.getUserPost = async (req, res, next) => {
-  try {
-    const userId = await FriendService.findFriendId(req.user.id); // [friendId1, friendId2, friendId3, ...]
-    userId.push(req.user.id); // Add myId to userId => [friendId1, friendId2, friendId3, ..., myId]
+// exports.getUserPost = async (req, res, next) => {
+//   try {
+//     const userId = await FriendService.findFriendId(req.user.id); // [friendId1, friendId2, friendId3, ...]
+//     userId.push(req.user.id); // Add myId to userId => [friendId1, friendId2, friendId3, ..., myId]
 
-    // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
-    const posts = await Post.findAll({
-      where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
-      order: [['updatedAt', 'DESC']],
-      attributes: {
-        exclude: ['userId'],
-      },
-      include: [
-        {
-          model: User,
-          attributes: {
-            exclude: [
-              'password',
-              'email',
-              'phoneNumber',
-              'coverPhoto',
-              'createdAt',
-            ],
-          },
-        },
-        {
-          model: Comment,
-          attributes: {
-            exclude: ['createdAt', 'userId'],
-          },
-          include: {
-            model: User,
-            attributes: {
-              exclude: [
-                'password',
-                'email',
-                'phoneNumber',
-                'coverPhoto',
-                'createdAt',
-              ],
-            },
-          },
-        },
-        {
-          model: Like,
-          attributes: {
-            exclude: ['createdAt'],
-          },
-          include: {
-            model: User,
-            attributes: {
-              exclude: [
-                'password',
-                'email',
-                'phoneNumber',
-                'coverPhoto',
-                'createdAt',
-              ],
-            },
-          },
-        },
-      ],
-    });
-    res.json({ posts });
-  } catch (err) {
-    next(err);
-  }
-};
+//     // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
+//     const posts = await Post.findAll({
+//       where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
+//       order: [['updatedAt', 'DESC']],
+//       attributes: {
+//         exclude: ['userId'],
+//       },
+//       include: [
+//         {
+//           model: User,
+//           attributes: {
+//             exclude: [
+//               'password',
+//               'email',
+//               'phoneNumber',
+//               'coverPhoto',
+//               'createdAt',
+//             ],
+//           },
+//         },
+//         {
+//           model: Comment,
+//           attributes: {
+//             exclude: ['createdAt', 'userId'],
+//           },
+//           include: {
+//             model: User,
+//             attributes: {
+//               exclude: [
+//                 'password',
+//                 'email',
+//                 'phoneNumber',
+//                 'coverPhoto',
+//                 'createdAt',
+//               ],
+//             },
+//           },
+//         },
+//         {
+//           model: Like,
+//           attributes: {
+//             exclude: ['createdAt'],
+//           },
+//           include: {
+//             model: User,
+//             attributes: {
+//               exclude: [
+//                 'password',
+//                 'email',
+//                 'phoneNumber',
+//                 'coverPhoto',
+//                 'createdAt',
+//               ],
+//             },
+//           },
+//         },
+//       ],
+//     });
+//     res.json({ posts });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
