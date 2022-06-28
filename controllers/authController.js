@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const createError = require('../util/createError');
 const {
   User,
+  UserDetail,
   Education,
   Skill,
   Experience,
@@ -52,6 +53,10 @@ exports.register = async (req, res, next) => {
         confirmPassword,
         role,
         email,
+        firstName,
+        lastName,
+        birthDate,
+        gender,
         phoneNumber,
         educationArray,
         experienceArray,
@@ -105,6 +110,14 @@ exports.register = async (req, res, next) => {
 
         //create Education
         if (role === 'user') {
+          await UserDetail.create({
+            firstName,
+            lastName,
+            birthDate,
+            gender,
+            userId: user.id,
+          });
+
           const eduArray = Object.values(JSON.parse(educationArray));
 
           eduArray.map(
