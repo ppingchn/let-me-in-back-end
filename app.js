@@ -20,7 +20,6 @@ const likeRout = require('./routes/likeRoute');
 const likeCommentRout = require('./routes/likeCommentRoute');
 const repliesCommentRoute = require('./routes/replyRoute');
 
-
 const app = express();
 
 // middleware
@@ -47,8 +46,8 @@ app.use('/like', likeRout);
 //like comment
 app.use('/likeComment', likeCommentRout);
 
+//reply
 app.use('/repliesComment', repliesCommentRoute);
-
 
 app.listen(process.env.PORT, () => {
   console.log(`This server running on PORT ${process.env.PORT}`);

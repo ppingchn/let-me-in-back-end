@@ -1,10 +1,10 @@
-const express = require("express");
-const { PostPicture, Post } = require("../models");
-const createError = require("../util/createError");
+const express = require('express');
+const { PostPicture, Post } = require('../models');
+const createError = require('../util/createError');
 
-const fs = require("fs");
-const cloudinary = require("../util/cloundinary");
-const { sequelize } = require("../models");
+const fs = require('fs');
+const cloudinary = require('../util/cloundinary');
+const { sequelize } = require('../models');
 exports.createpostPic = async (req, res, next) => {
   try {
     if (req.files?.postPic) {
@@ -14,12 +14,12 @@ exports.createpostPic = async (req, res, next) => {
       const { postId } = req.body;
       const post = Post.findOne({ where: { id: postId, userId } });
       if (!post) {
-        createError("No permissions", 403);
+        createError('No permissions', 403);
       }
       const picPost = await PostPicture.create({ postPic, postId, userId });
       res.status(201).json({ picPost });
     } else {
-      createError("no file found", 400);
+      createError('no file found', 400);
     }
   } catch (error) {
     next(error);
@@ -38,11 +38,11 @@ exports.updatepostPic = async (req, res, next) => {
       where: { id: postPicId, userId },
     });
     if (!postPic) {
-      createError("Postpic not found", 404);
+      createError('Postpic not found', 404);
     }
     if (req.files?.postPic) {
-      const split = postPic.postPic.split("/");
-      const publicId = split[split.length - 1].split(".")[0];
+      const split = postPic.postPic.split('/');
+      const publicId = split[split.length - 1].split('.')[0];
       await cloudinary.destroy(publicId);
       const result = await cloudinary.upload(req.files.postPic[0].path);
       const urlpostPic = result.secure_url;
@@ -50,7 +50,7 @@ exports.updatepostPic = async (req, res, next) => {
       await postPic.save();
       res.json({ postPic });
     } else {
-      createError("no file found", 400);
+      createError('no file found', 400);
     }
   } catch (error) {
     next(error);
@@ -61,23 +61,22 @@ exports.updatepostPic = async (req, res, next) => {
   }
 };
 exports.deletepostPic = async (req, res, next) => {
-  console.log("haha");
   try {
     t = await sequelize.transaction();
     const { postPicId } = req.params;
     const postPic = await PostPicture.findOne({ where: { id: postPicId } });
     if (!postPic) {
-      createError("Post pic not found", 404);
+      createError('Post pic not found', 404);
     }
     if (postPic.userId !== req.user.id) {
-      createError("you have no permission", 403);
+      createError('you have no permission', 403);
     }
     // await Comment.destroy({ where: { id: postpicId } }, { transaction: t });
     // await Like.destroy({ where: { id: postpicId } }, { transaction: t });
 
     if (postPic) {
-      const split = postPic.postPic.split("/");
-      const publicId = split[split.length - 1].split(".")[0];
+      const split = postPic.postPic.split('/');
+      const publicId = split[split.length - 1].split('.')[0];
       await cloudinary.destroy(publicId);
     }
     await postPic.destroy({ where: { id: postPicId } }, { transaction: t });

@@ -1,46 +1,122 @@
-const createError = require("../util/createError");
-
-const { Post, Like, sequelize } = require("../models");
+const createError = require('../util/createError');
+const fs = require('fs');
+const cloudinary = require('../util/cloundinary');
+const { Post, Like, PostPicture, sequelize } = require('../models');
+const { post } = require('../routes/registerRoute');
 
 exports.createPost = async (req, res, next) => {
   try {
-    const { detail } = req.body;
-    if (!detail) {
-      createError("detail is required", 400);
-    }
-    if (!req.user) {
-      createError("you have no permission", 403);
-    }
-    const post = await Post.create({ detail, userId: req.user.id });
-    res.json({ post });
+    const result = await sequelize.transaction(async (t) => {
+      const { detail } = req.body;
+
+      let postId;
+
+      if (!detail) {
+        createError('detail is required', 400);
+      }
+      if (!req.user) {
+        createError('you have no permission', 403);
+      }
+      if (detail || postPicArr) {
+        const post = await Post.create({
+          detail,
+          userId: req.user.id,
+        });
+        postId = post.id;
+      }
+      if (req.files?.postPicArr) {
+        for (let pic of req.files?.postPicArr) {
+          const result = await cloudinary.upload(pic.path);
+
+          await PostPicture.create({
+            postPic: result.secure_url,
+
+            postId,
+          });
+        }
+      }
+    });
+
+    res.status(201).json(result);
   } catch (err) {
     next(err);
+  } finally {
+    if (req.files?.postPicArr) {
+      fs.unlinkSync(req.files.postPicArr[0].path);
+    }
   }
 };
 exports.updatePost = async (req, res, next) => {
   try {
-    const { postId } = req.params;
-    const { detail } = req.body;
-    if (!detail) {
-      createError("detail is required", 400);
-    }
+    const result = await sequelize.transaction(async (t) => {
+      const { postId } = req.params;
+      const { detail, postPicIdArray } = req.body;
+      const { postPicArray } = req.files;
+      // console.log(postPicArray);
 
-    const post = await Post.findOne({ where: { id: postId } });
-    if (!post) {
-      createError("post not found", 404);
-    }
-    if (post.userId !== req.user.id) {
-      createError("you have no permission", 403);
-    }
+      const picArray = [];
+      // console.log('*************');
 
-    if (detail) {
-      post.detail = detail;
-    }
-    await post.save();
+      for (let i = 0; i < postPicArray.length; i++) {
+        // console.log(JSON.parse(postPicIdArray)[i]);
+        // console.log('-------------');
+        // console.log(postPicArray[i]);
+        if (JSON.parse(postPicIdArray)[i]) {
+          picArray.push({
+            id: JSON.parse(postPicIdArray)[i],
+            file: postPicArray[i].path,
+          });
+        } else {
+          picArray.push({ file: postPicArray[i].path });
+        }
+      }
 
+      console.log(picArray);
+      if (!detail) {
+        createError('detail is required', 400);
+      }
+
+      const post = await Post.findOne({ where: { id: postId } });
+      if (!post) {
+        createError('post not found', 404);
+      }
+      if (post.userId !== req.user.id) {
+        createError('you have no permission', 403);
+      }
+
+      if (detail) {
+        post.detail = detail;
+      }
+      await post.save();
+
+      //find id postPic
+      picArray.map(async (el, idx) => {
+        if (el.id) {
+          let findPic = await PostPicture.findOne({ where: { id: el.id } });
+
+          if (findPic) {
+            await cloudinary.destroy(findPic.postPic);
+            const result = await cloudinary.upload(el.file);
+            findPic.postPic = result.secure_url;
+            await findPic.save();
+          } else {
+            createError('Post pic is not found');
+          }
+        } else {
+          const result = await cloudinary.upload(el.file);
+          await PostPicture.create({
+            postPic: result.secure_url,
+            postId,
+          });
+        }
+      });
+    });
     res.json({ post });
   } catch (err) {
     next(err);
+  }
+  if (req.files?.postPic) {
+    fs.unlinkSync(req.files.postPic[0].path);
   }
 };
 exports.deletePost = async (req, res, next) => {
@@ -48,17 +124,44 @@ exports.deletePost = async (req, res, next) => {
   try {
     t = await sequelize.transaction();
     const { postId } = req.params;
+    const { postPicId } = req.body;
     const post = await Post.findOne({ where: { id: postId } });
+    const postPic = await PostPicture.fineOne({ where: { id: postPicId } });
     if (!post) {
-      createError("post not found", 400);
+      createError('post not found', 400);
     }
     if (post.userId !== req.user.id) {
-      createError("you have no permission", 403);
+      createError('you have no permission', 403);
     }
-    // await Comment.destroy({ where: { postId: postId } }, { transaction: t });
-    // await Like.destroy({ where: { postId: postId } }, { transaction: t });
+    //delete all post
+    if (post) {
+      await Comment.destroy({ where: { postId: postId } }, { transaction: t });
+      await Like.destroy({ where: { postId: postId } }, { transaction: t });
+      await Post.destroy({ where: { id: postId } }, { transaction: t });
+      await PostPicture.destroy(
+        { where: { id: postPicId }, postId },
+        { transaction: t },
+      );
+    }
+    //delete detail
+    if (post.detail) {
+      await Post.destroy({ where: detail }, { transaction: t });
+    }
 
-    await Post.destroy({ where: { id: postId } }, { transaction: t });
+    //postPic
+
+    if (!postPic) {
+      createError('post not found', 404);
+    }
+    if (!postId) {
+      createError('you have permission', 403);
+    }
+    if (postPic) {
+      await PostPicture.destroy(
+        { where: { id: postPicId }, postId },
+        { transaction: t },
+      );
+    }
     await t.commit();
     res.status(204).json();
   } catch (err) {
@@ -75,37 +178,37 @@ exports.getUserPost = async (req, res, next) => {
     // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
     const posts = await Post.findAll({
       where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
-      order: [["updatedAt", "DESC"]],
+      order: [['updatedAt', 'DESC']],
       attributes: {
-        exclude: ["userId"],
+        exclude: ['userId'],
       },
       include: [
         {
           model: User,
           attributes: {
             exclude: [
-              "password",
-              "email",
-              "phoneNumber",
-              "coverPhoto",
-              "createdAt",
+              'password',
+              'email',
+              'phoneNumber',
+              'coverPhoto',
+              'createdAt',
             ],
           },
         },
         {
           model: Comment,
           attributes: {
-            exclude: ["createdAt", "userId"],
+            exclude: ['createdAt', 'userId'],
           },
           include: {
             model: User,
             attributes: {
               exclude: [
-                "password",
-                "email",
-                "phoneNumber",
-                "coverPhoto",
-                "createdAt",
+                'password',
+                'email',
+                'phoneNumber',
+                'coverPhoto',
+                'createdAt',
               ],
             },
           },
@@ -113,17 +216,17 @@ exports.getUserPost = async (req, res, next) => {
         {
           model: Like,
           attributes: {
-            exclude: ["createdAt"],
+            exclude: ['createdAt'],
           },
           include: {
             model: User,
             attributes: {
               exclude: [
-                "password",
-                "email",
-                "phoneNumber",
-                "coverPhoto",
-                "createdAt",
+                'password',
+                'email',
+                'phoneNumber',
+                'coverPhoto',
+                'createdAt',
               ],
             },
           },
