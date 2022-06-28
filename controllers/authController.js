@@ -63,7 +63,7 @@ exports.register = async (req, res, next) => {
         skillArray,
         companyName,
         websiteLink,
-        overView,
+        overview,
         address,
         location,
       } = req.body;
@@ -158,7 +158,7 @@ exports.register = async (req, res, next) => {
           await CompanyDetail.create({
             companyName,
             websiteLink,
-            overView,
+            overview,
             address,
             location,
             userId: user.id,
