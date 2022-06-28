@@ -132,7 +132,7 @@ exports.register = async (req, res, next) => {
               }),
           );
 
-          const skill = JSON.parse(skillArray);
+          const skill = Object.values(JSON.parse(skillArray));
 
           skill.map(
             async (el) =>
