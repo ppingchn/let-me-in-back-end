@@ -67,6 +67,12 @@ exports.register = async (req, res, next) => {
         overview,
         address,
         location,
+        country,
+        houseNumber,
+        subDistrict,
+        district,
+        province,
+        postCode,
       } = req.body;
 
       // console.log(birthDate);
@@ -99,6 +105,25 @@ exports.register = async (req, res, next) => {
         createError('password did not match', 400);
       }
 
+      if (!country) {
+        createError('country is require', 400);
+      }
+      if (!houseNumber) {
+        createError('houseNumber is require', 400);
+      }
+      if (!subDistrict) {
+        createError('subDistrict is require', 400);
+      }
+      if (!district) {
+        createError('district is require', 400);
+      }
+      if (!province) {
+        createError('province is require', 400);
+      }
+      if (!postCode) {
+        createError('postCode is require', 400);
+      }
+
       // Make sure they gave use a valid phone number
       const isPhoneNumber = validator.isMobilePhone(phoneNumber + '');
       if (!isPhoneNumber) {
@@ -116,6 +141,12 @@ exports.register = async (req, res, next) => {
           email,
           phoneNumber,
           password: hashedPassword,
+          country,
+          houseNumber,
+          subDistrict,
+          district,
+          province,
+          postCode,
         });
 
         //create Education
