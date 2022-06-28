@@ -5,17 +5,21 @@ const express = require('express');
 const cors = require('cors');
 
 const { sequelize } = require('./models/index');
+
+// sequelize.sync({ force: true });
 // sequelize.sync({ alter: true });
 
 //import route
 const registerRoute = require('./routes/registerRoute');
 const loginRoute = require('./routes/loginRout');
+
 const postRoute = require('./routes/postRoute');
 const postPicRoute = require('./routes/postPicRoute');
 const commentRoute = require('./routes/commentRoute');
 const likeRout = require('./routes/likeRoute');
 const likeCommentRout = require('./routes/likeCommentRoute');
 const repliesCommentRoute = require('./routes/replyRoute');
+
 
 const app = express();
 
@@ -44,6 +48,7 @@ app.use('/like', likeRout);
 app.use('/likeComment', likeCommentRout);
 
 app.use('/repliesComment', repliesCommentRoute);
+
 
 app.listen(process.env.PORT, () => {
   console.log(`This server running on PORT ${process.env.PORT}`);
