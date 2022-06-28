@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       username: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
         validate: {
           notEmpty: true,
         },
@@ -19,12 +20,12 @@ module.exports = (sequelize, DataTypes) => {
       profilePic: DataTypes.STRING,
       coverPic: DataTypes.STRING,
       role: DataTypes.ENUM(['user', 'company']),
-      email: DataTypes.STRING,
+      email: { type: DataTypes.STRING, unique: true },
       phoneNumber: DataTypes.STRING,
     },
     {
       underscore: true,
-    }
+    },
   );
   User.associate = (models) => {
     User.hasMany(models.Education, {
@@ -93,7 +94,7 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
     });
     User.hasMany(models.Follow, {
-      as: 'Employee',
+      as: 'User',
       foreignKey: {
         name: 'userId',
         allowNull: false,
