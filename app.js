@@ -11,8 +11,10 @@ const { sequelize } = require('./models/index');
 //import route
 const registerRoute = require('./routes/registerRoute');
 const loginRoute = require('./routes/loginRout');
-const followRoute = require('./routes/followRoute');
-const authenticate = require('./middlewares/authenticate')
+const errorMiddleware = require('./middlewares/error');
+const notFoundMiddleware = require('./middlewares/notFound');
+const authenticate = require('./middlewares/authenticate');
+const userRoute = require('./routes/userRoute');
 
 const app = express();
 
@@ -24,10 +26,14 @@ app.use(express.urlencoded({ extended: false }));
 //login and register
 app.use('/login', loginRoute);
 app.use('/register', registerRoute);
+app.use('/users', authenticate, userRoute);
 
-app.use('/follow',authenticate, followRoute)
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
 
-app.use()
+app.use('/follow', authenticate, followRoute);
+
+app.use();
 
 app.listen(process.env.PORT, () => {
   console.log(`This server running on PORT ${process.env.PORT}`);

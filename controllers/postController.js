@@ -1,10 +1,10 @@
-const createError = require("../utils/createError");
+const createError = require('../util/createError');
 
 exports.createPost = async (req, res, next) => {
   try {
     const { detial } = req.body;
     if (!detial && !req.file) {
-      createError("detial or image is required", 400);
+      createError('detial or image is required', 400);
     }
 
     const post = await Post.create({ detial, userId: req.user.id });
@@ -22,15 +22,15 @@ exports.updatePost = async (req, res, next) => {
     const { id } = req.params;
     const { detial } = req.body;
     if (!detial && !req.file) {
-      createError("detial or image is required", 400);
+      createError('detial or image is required', 400);
     }
 
     const post = await Post.findOne({ where: { id } });
     if (!post) {
-      createError("post not found", 400);
+      createError('post not found', 400);
     }
     if (post.userId !== req.user.id) {
-      createError("you have no permission", 403);
+      createError('you have no permission', 403);
     }
 
     if (detial) {
@@ -54,10 +54,10 @@ exports.deletePost = async (req, res, next) => {
     const { id } = req.params;
     const post = await Post.findOne({ where: { id } });
     if (!post) {
-      createError("post not found", 400);
+      createError('post not found', 400);
     }
     if (post.userId !== req.user.id) {
-      createError("you have no permission", 403);
+      createError('you have no permission', 403);
     }
     await Comment.destroy({ where: { postId: id } }, { transaction: t });
     await Like.destroy({ where: { postId: id } }, { transaction: t });
