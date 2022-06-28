@@ -1,6 +1,7 @@
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
 
 const createError = require('../util/createError');
 const {
@@ -68,7 +69,16 @@ exports.register = async (req, res, next) => {
         location,
       } = req.body;
 
-      const stockPic = {};
+      // console.log(birthDate);
+      const user = await User.findOne({
+        where: { [Op.or]: [{ username }, { email }] },
+      });
+
+      if (user) {
+        createError('username or email is already used');
+      }
+
+      let stockPic = {};
 
       if (req.files?.profilePic) {
         const result = await cloudinary.upload(req.files.profilePic[0].path);
@@ -109,6 +119,8 @@ exports.register = async (req, res, next) => {
         });
 
         //create Education
+        console.log('/n/n/n/n =============');
+        console.log(firstName, lastName, birthDate, gender, user.id);
         if (role === 'user') {
           await UserDetail.create({
             firstName,
@@ -119,6 +131,7 @@ exports.register = async (req, res, next) => {
           });
 
           const eduArray = Object.values(JSON.parse(educationArray));
+          console.log(eduArray);
 
           eduArray.map(
             async (el) =>
@@ -133,6 +146,7 @@ exports.register = async (req, res, next) => {
           );
 
           const experience = Object.values(JSON.parse(experienceArray));
+          console.log(experience);
 
           experience.map(
             async (el) =>
@@ -145,15 +159,21 @@ exports.register = async (req, res, next) => {
               }),
           );
 
-          const skill = Object.values(JSON.parse(skillArray));
+          //////////////////// DONT OPEN THIS ///////////////////////////
+          //////////////////// DONT OPEN THIS ///////////////////////////
+          //////////////////// DONT OPEN THIS ///////////////////////////
+          //////////////////// DONT OPEN THIS ///////////////////////////
+          //////////////////// DONT OPEN THIS ///////////////////////////
+          //////////////////// DONT OPEN THIS ///////////////////////////
+          // const skill = Object.values(JSON.parse(skillArray));
 
-          skill.map(
-            async (el) =>
-              await Skill.create({
-                title: el.title,
-                userId: user.id,
-              }),
-          );
+          // skill.map(
+          //   async (el) =>
+          //     await Skill.create({
+          //       title: el.title,
+          //       userId: user.id,
+          //     }),
+          // );
         } else if (role === 'company') {
           await CompanyDetail.create({
             companyName,
