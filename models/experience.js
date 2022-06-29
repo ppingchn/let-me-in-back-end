@@ -16,6 +16,13 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
+      workDescription: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
+      },
       yearStart: {
         type: DataTypes.DATEONLY,
         allowNull: false,
@@ -27,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       underscore: true,
-    }
+    },
   );
   Experience.associate = (models) => {
     Experience.belongsTo(models.User, {

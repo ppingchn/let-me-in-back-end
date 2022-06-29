@@ -1,14 +1,26 @@
-const createErroror = require("../utils/createerroror");
+const createError = require('../util/createError');
+
+const { Experience } = require('../models');
+
 exports.createExperience = async (req, res, next) => {
   try {
-    const { companyName, position, yearStart, yearEnd, userId } = req.body;
+    const {
+      companyName,
+      position,
+      yearStart,
+      yearEnd,
+      userId,
+      workDescription,
+    } = req.body;
     const experience = await Experience.create({
       companyName,
       position,
       yearStart,
       yearEnd,
       userId,
+      workDescription,
     });
+    res.json({ experience });
   } catch (error) {
     next(error);
   }
@@ -22,7 +34,7 @@ exports.updateExperience = async (req, res, next) => {
       where: { id: experienceId },
     });
     if (!experience) {
-      createErroror("Experience not found");
+      createError('Experience not found');
     }
     bodyUpdate = { companyName, position, yearStart, yearEnd };
     await experience.update(bodyUpdate);
@@ -36,7 +48,7 @@ exports.deleteExperience = async () => {
     const { experienceId } = req.params;
     const experience = await Experience.findOne({ whre: { id: experienceId } });
     if (!experience) {
-      createErroror("Experience not found", 404);
+      createError('Experience not found', 404);
     }
     await experience.destroy();
     res.status(204).json();
