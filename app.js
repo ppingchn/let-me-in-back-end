@@ -16,6 +16,7 @@ const notFoundMiddleware = require('./middlewares/notFound');
 const authenticate = require('./middlewares/authenticate');
 const userRoute = require('./routes/userRoute');
 const followRoute = require('./routes/followRoute');
+const experienceRoute = require('./routes/experienceRoute');
 
 const app = express();
 
@@ -29,11 +30,13 @@ app.use('/login', loginRoute);
 app.use('/register', registerRoute);
 app.use('/users', authenticate, userRoute);
 
+app.use('/follow', authenticate, followRoute);
+app.use('/experience', authenticate, experienceRoute);
+
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
 // app.use('/follow', authenticate, followRoute);
-app.use('/follow', authenticate, followRoute);
 
 app.listen(process.env.PORT, () => {
   console.log(`This server running on PORT ${process.env.PORT}`);
