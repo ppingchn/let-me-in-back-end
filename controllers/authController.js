@@ -187,6 +187,7 @@ exports.register = async (req, res, next) => {
                 position: el.position,
                 yearStart: el.startDate,
                 yearEnd: el.endDate,
+                workDescription: el.workDescription,
                 userId: user.id,
               }),
           );
