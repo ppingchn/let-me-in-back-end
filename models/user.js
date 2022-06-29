@@ -64,6 +64,7 @@ module.exports = (sequelize, DataTypes) => {
       role: DataTypes.ENUM(['user', 'company']),
       email: { type: DataTypes.STRING, unique: true },
       phoneNumber: DataTypes.STRING,
+      detail: DataTypes.STRING,
     },
     {
       underscore: true,

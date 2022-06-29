@@ -9,7 +9,6 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
-      detail: DataTypes.STRING,
       websiteLink: DataTypes.STRING,
       overview: DataTypes.STRING,
       address: DataTypes.STRING,
@@ -17,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       underscore: true,
-    }
+    },
   );
   CompanyDetail.associate = (models) => {
     CompanyDetail.belongsTo(models.User, {

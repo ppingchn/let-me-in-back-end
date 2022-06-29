@@ -17,6 +17,7 @@ const notFoundMiddleware = require('./middlewares/notFound');
 const authenticate = require('./middlewares/authenticate');
 const userRoute = require('./routes/userRoute');
 const followRoute = require('./routes/followRoute');
+const experienceRoute = require('./routes/experienceRoute');
 
 const postRoute = require('./routes/postRoute');
 const postPicRoute = require('./routes/postPicRoute');
@@ -39,6 +40,11 @@ app.use('/users', authenticate, userRoute);
 
 //post
 app.use('/post', postRoute);
+app.use('/follow', authenticate, followRoute);
+app.use('/experience', authenticate, experienceRoute);
+
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
 
 //postPic
 app.use('/postPic', postPicRoute);
@@ -55,7 +61,6 @@ app.use('/likeComment', likeCommentRout);
 //reply
 app.use('/repliesComment', repliesCommentRoute);
 // app.use('/follow', authenticate, followRoute);
-app.use('/follow', authenticate, followRoute);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
