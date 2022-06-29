@@ -37,6 +37,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/login', loginRoute);
 app.use('/register', registerRoute);
 app.use('/users', authenticate, userRoute);
+// app.use('/follow', authenticate, followRoute);
+app.use('/follow', authenticate, followRoute);
 
 //post
 app.use('/post', postRoute);
@@ -45,6 +47,7 @@ app.use('/experience', authenticate, experienceRoute);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
+
 
 //postPic
 app.use('/postPic', postPicRoute);

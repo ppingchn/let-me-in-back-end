@@ -1,11 +1,11 @@
 const express = require('express');
 const createError = require('../util/createError');
-const { Follow, User, Company } = require('../models');
+const { Follow, User } = require('../models');
 const { Op } = require('sequelize');
 
 exports.getAllFollows = async (req, res, next) => {
   try {
-    const userId = req.user.Id
+    const userId = req.user.id;
     const follow = await Follow.findAll({
       where: {
         userId,
@@ -13,7 +13,7 @@ exports.getAllFollows = async (req, res, next) => {
       include: [
         {
           model: User,
-          as: 'Employee',
+          as: 'User',
           attributes: {
             exclude: ['password'],
           },
@@ -36,9 +36,8 @@ exports.getAllFollows = async (req, res, next) => {
 
 exports.createFollows = async (req, res, next) => {
   try {
-    const userId = req.user.Id
     const { companyId } = req.body;
-    const follow = await Follow.create({ userId, companyId });
+    const follow = await Follow.create({ userId: req.user.id, companyId });
     res.status(201).json({ follow });
   } catch (error) {
     next(error);
@@ -47,10 +46,10 @@ exports.createFollows = async (req, res, next) => {
 
 exports.deleteFollows = async (req, res, next) => {
   try {
-      const userId = req.user.Id
+    const userId = req.user.id;
     const { companyId } = req.params;
     const company = await Follow.findOne({
-      where: { [Op.and]: [{ companyId }, { userId}] },
+      where: { [Op.and]: [{ companyId }, { userId }] },
     });
     if (!company) {
       createError('Company not found', 404);
