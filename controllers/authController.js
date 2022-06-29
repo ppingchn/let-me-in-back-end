@@ -64,7 +64,7 @@ exports.register = async (req, res, next) => {
         skillArray,
         companyName,
         websiteLink,
-        overview,
+        detail,
         country,
         houseNumber,
         subDistrict,
