@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const { Friend, User } = require('../models');
 const { FRIEND_ACCEPTED, FRIEND_PENDING } = require('../config/constants');
 const FriendService = require('../service/friendsService');
+const createError = require('../util/createError');
 
 exports.getAllFriend = async (req, res, next) => {
   try {
@@ -27,19 +28,40 @@ exports.getAllFriend = async (req, res, next) => {
   }
 };
 
-exports.findFriendId = async (id) => {
-  const friends = await Friend.findAll({
-    where: {
-      [Op.or]: [{ requestToId: id }, { requestFromId: id }],
-      status: FRIEND_ACCEPTED,
-    },
-  });
+exports.findFriendId = async (req, res, next) => {
+  try {
+    const {requestToId} = req.params;
 
-  const friendIds = friends.map((el) =>
-    el.requestToId === id ? el.requestFromId : el.requestToId,
-  );
+    if (req.user.id === +requestToId) {
+      createError('cannot request yourself', 400);
+    }
 
-  return friendIds;
+    const existFriend = await Friend.findOne({
+      where: {
+        [Op.or]: [
+          { requestFromId: req.user.id, requestToId: requestToId },
+          { requestFromId: requestToId, requestToId: req.user.id },
+        ],
+      },
+    });
+
+    console.log(existFriend)
+    if (!existFriend) {
+      createError('this user is not a friend yet', 400);
+    }
+
+    
+    const friends = await Friend.findAll({
+      where: {
+        [Op.and]: [{ requestToId: requestToId }, { requestFromId: req.user.id }],
+        status: FRIEND_ACCEPTED,
+      },
+    });
+
+    res.json({ friends });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.requestFriend = async (req, res, next) => {
@@ -54,9 +76,9 @@ exports.requestFriend = async (req, res, next) => {
       where: {
         [Op.or]: [
           { requestFromId: req.user.id, requestToId: requestToId },
-          { requestFromId: requestToId, requestToId: req.user.id }
-        ]
-      }
+          { requestFromId: requestToId, requestToId: req.user.id },
+        ],
+      },
     });
 
     if (existFriend) {
@@ -66,7 +88,7 @@ exports.requestFriend = async (req, res, next) => {
     const friend = await Friend.create({
       requestToId,
       requestFromId: req.user.id,
-      status: FRIEND_PENDING
+      status: FRIEND_PENDING,
     });
     res.json({ friend });
   } catch (err) {
@@ -76,13 +98,13 @@ exports.requestFriend = async (req, res, next) => {
 
 exports.updateFriend = async (req, res, next) => {
   try {
-    const { requestFromId } = req.params;
+    const { requestToId } = req.params;
     const friend = await Friend.findOne({
       where: {
-        requestFromId,
-        requestToId: req.user.id,
-        status: FRIEND_PENDING
-      }
+        requestFromId: req.user.id,
+        requestToId,
+        status: FRIEND_PENDING,
+      },
     });
 
     if (!friend) {
