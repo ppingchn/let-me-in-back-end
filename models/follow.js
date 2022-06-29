@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
     });
     Follow.belongsTo(models.User, {
-      as: 'Employee',
+      as: 'User',
       foreignKey: {
         name: 'userId',
         allowNull: false,
