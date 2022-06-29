@@ -64,15 +64,14 @@ exports.register = async (req, res, next) => {
         skillArray,
         companyName,
         websiteLink,
-        overview,
-        address,
-        location,
+        detail,
         country,
         houseNumber,
         subDistrict,
         district,
         province,
         postCode,
+        location,
       } = req.body;
 
       // console.log(birthDate);
@@ -140,6 +139,7 @@ exports.register = async (req, res, next) => {
           role,
           email,
           phoneNumber,
+          detail,
           password: hashedPassword,
           country,
           houseNumber,
@@ -186,6 +186,7 @@ exports.register = async (req, res, next) => {
                 position: el.position,
                 yearStart: el.startDate,
                 yearEnd: el.endDate,
+                workDescription: el.workDescription,
                 userId: user.id,
               }),
           );
@@ -209,7 +210,6 @@ exports.register = async (req, res, next) => {
           await CompanyDetail.create({
             companyName,
             websiteLink,
-            overview,
             address,
             location,
             userId: user.id,

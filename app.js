@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 
 const { sequelize } = require('./models/index');
+
 // sequelize.sync({ force: true });
 // sequelize.sync({ alter: true });
 
@@ -16,6 +17,14 @@ const notFoundMiddleware = require('./middlewares/notFound');
 const authenticate = require('./middlewares/authenticate');
 const userRoute = require('./routes/userRoute');
 const followRoute = require('./routes/followRoute');
+const experienceRoute = require('./routes/experienceRoute');
+
+const postRoute = require('./routes/postRoute');
+const postPicRoute = require('./routes/postPicRoute');
+const commentRoute = require('./routes/commentRoute');
+const likeRout = require('./routes/likeRoute');
+const likeCommentRout = require('./routes/likeCommentRoute');
+const repliesCommentRoute = require('./routes/replyRoute');
 
 const app = express();
 
@@ -30,6 +39,31 @@ app.use('/register', registerRoute);
 app.use('/users', authenticate, userRoute);
 // app.use('/follow', authenticate, followRoute);
 app.use('/follow', authenticate, followRoute);
+
+//post
+app.use('/post', postRoute);
+app.use('/follow', authenticate, followRoute);
+app.use('/experience', authenticate, experienceRoute);
+
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
+
+
+//postPic
+app.use('/postPic', postPicRoute);
+
+//comment
+app.use('/comment', commentRoute);
+
+//like post
+app.use('/like', likeRout);
+
+//like comment
+app.use('/likeComment', likeCommentRout);
+
+//reply
+app.use('/repliesComment', repliesCommentRoute);
+// app.use('/follow', authenticate, followRoute);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
