@@ -18,7 +18,7 @@ const authenticate = require('./middlewares/authenticate');
 const userRoute = require('./routes/userRoute');
 const followRoute = require('./routes/followRoute');
 const experienceRoute = require('./routes/experienceRoute');
-
+const friendRouter =require('./routes/friendsRoute')
 const postRoute = require('./routes/postRoute');
 const postPicRoute = require('./routes/postPicRoute');
 const commentRoute = require('./routes/commentRoute');
@@ -42,6 +42,7 @@ app.use('/follow', authenticate, followRoute);
 
 //post
 app.use('/post', postRoute);
+app.use('/friends', authenticate, friendRouter);
 app.use('/follow', authenticate, followRoute);
 app.use('/experience', authenticate, experienceRoute);
 

@@ -1,6 +1,6 @@
-const { Op } = require("sequelize");
-const { Friend, User } = require("../models");
-const { FRIEND_ACCEPTED, FRIEND_PENDING } = require("../config/constants");
+const { Op } = require('sequelize');
+const { Friend, User } = require('../models');
+const { FRIEND_ACCEPTED, FRIEND_PENDING } = require('../config/constants');
 
 exports.findFriendId = async (id) => {
   const friends = await Friend.findAll({
@@ -11,7 +11,7 @@ exports.findFriendId = async (id) => {
   });
 
   const friendIds = friends.map((el) =>
-    el.requestToId === id ? el.requestFromId : el.requestToId
+    el.requestToId === id ? el.requestFromId : el.requestToId,
   );
 
   return friendIds;
@@ -26,12 +26,12 @@ exports.findAcceptedFriend = async (id) => {
   });
 
   const friendIds = friends.map((el) =>
-    el.requestToId === id ? el.requestFromId : el.requestToId
+    el.requestToId === id ? el.requestFromId : el.requestToId,
   );
 
   const users = await User.findAll({
     where: { id: friendIds },
-    attributes: { exclude: ["password"] },
+    attributes: { exclude: ['password'] },
   });
 
   return users;
@@ -45,9 +45,20 @@ exports.findPendingFriend = async (id) => {
     },
     include: {
       model: User,
-      as: "RequestFrom",
+      as: 'RequestFrom',
       attributes: {
-        exclude: ["password"],
+        exclude: [
+          'password',
+          // 'email',
+          // 'phonenUmber',
+          // 'detail',
+          // 'country',
+          // 'houseNumber',
+          // 'subDistrict',
+          // 'district',
+          // 'province',
+          // 'postCode',
+        ],
       },
     },
   });
@@ -62,9 +73,9 @@ exports.findRequestFriend = async (id) => {
     },
     include: {
       model: User,
-      as: "RequestTo",
+      as: 'RequestTo',
       attributes: {
-        exclude: ["password"],
+        exclude: ['password'],
       },
     },
   });
@@ -79,15 +90,16 @@ exports.findUnknown = async (id) => {
   });
 
   const friendIds = friends.map((el) =>
-    el.requestToId === id ? el.requestFromId : el.requestToId
+    el.requestToId === id ? el.requestFromId : el.requestToId,
   );
 
   friendIds.push(id);
 
   const users = await User.findAll({
     where: { id: { [Op.notIn]: friendIds } },
-    attributes: { exclude: ["password"] },
+    attributes: { exclude: ['password'] },
   });
 
   return users;
 };
+
