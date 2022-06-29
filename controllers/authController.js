@@ -65,14 +65,13 @@ exports.register = async (req, res, next) => {
         companyName,
         websiteLink,
         detail,
-        address,
-        location,
         country,
         houseNumber,
         subDistrict,
         district,
         province,
         postCode,
+        location,
       } = req.body;
 
       // console.log(birthDate);

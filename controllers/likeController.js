@@ -1,39 +1,52 @@
-const createError = require("../utils/createError");
+const createError = require('../util/createError');
+const { LikePost, Post, sequelize } = require('../models');
+
 exports.createLike = async (req, res, next) => {
+  const t = await sequelize.transaction();
   try {
-    const { userId, postId } = req.body;
-    const like = await Like.create({ userId, postId });
-    res.status(201).json({ like });
+    const { postId } = req.body;
+    const likePost = await LikePost.findOne({
+      where: { postId, userId: req.user.id },
+    });
+    if (likePost) {
+      createError('you already liked this post', 400);
+    }
+    const post = await Post.findOne({ where: { id: postId } });
+    if (!post) {
+      createError('post not found', 404);
+    }
+    const likes = await LikePost.create(
+      { postId, userId: req.user.id },
+      { transaction: t },
+    );
+    await post.increment({ likes: 1 }, { transaction: t });
+    await t.commit();
+    res.status(201).json({ likes });
   } catch (error) {
     next(error);
   }
 };
 
-exports.updateLike = async (req, res, next) => {
-  try {
-    const { userId, postId } = req.body;
-    const { likeId } = req.params;
-    const like = await Like.finOne({ where: likeId });
-    if (!like) {
-      createError("Like not found", 404);
-    }
-    bodyUpdate = { userId, postId };
-    await like.update(bodyUpdate);
-    res.json({ like });
-  } catch (error) {
-    next(error);
-  }
-};
 exports.deleteLike = async (req, res, next) => {
+  const t = await sequelize.transaction();
   try {
-    const { likeId } = req.params;
-    const like = await Like.findOne({ where: { id: likeId } });
-    if (!like) {
-      createError("like not success", 400);
+    const { postId } = req.params;
+    const likePost = await LikePost.findOne({
+      where: { postId, userId: req.user.id },
+    });
+    if (!likePost) {
+      createError('can not find like', 404);
     }
-    await like.destroy();
-    res.status(204).json({ like });
+    const post = await Post.findOne({ where: { id: postId } });
+    if (!post) {
+      createError('post not found', 404);
+    }
+    await likePost.destroy({ transection: t });
+    await post.decrement({ likes: 1 }, { transaction: t });
+    await t.commit();
+    res.status(204).json();
   } catch (error) {
+    await t.rollback();
     next(error);
   }
 };
