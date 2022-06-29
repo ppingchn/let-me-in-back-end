@@ -64,21 +64,17 @@ exports.deletepostPic = async (req, res, next) => {
   try {
     t = await sequelize.transaction();
     const { postPicId } = req.params;
+
     const postPic = await PostPicture.findOne({ where: { id: postPicId } });
     if (!postPic) {
       createError('Post pic not found', 404);
     }
-    if (postPic.userId !== req.user.id) {
+    const post = await Post.findOne({ where: { id: postPic.postId } });
+    console.log(post);
+    if (post.userId !== req.user.id) {
       createError('you have no permission', 403);
     }
-    // await Comment.destroy({ where: { id: postpicId } }, { transaction: t });
-    // await Like.destroy({ where: { id: postpicId } }, { transaction: t });
 
-    if (postPic) {
-      const split = postPic.postPic.split('/');
-      const publicId = split[split.length - 1].split('.')[0];
-      await cloudinary.destroy(publicId);
-    }
     await postPic.destroy({ where: { id: postPicId } }, { transaction: t });
     await t.commit();
     res.status(204).json({ postPic });

@@ -46,5 +46,6 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
     });
   };
+  Comment.belongsTo(Comment);
   return Comment;
 };

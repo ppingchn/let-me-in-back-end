@@ -39,6 +39,7 @@ module.exports = async (req, res, next) => {
     }
 
     const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    console.log(payload)
     const user = await User.findOne({
       where: { id: payload.id },
       attributes: {

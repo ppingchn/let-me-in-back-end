@@ -1,12 +1,21 @@
 const createError = require('../util/createError');
 const fs = require('fs');
 const cloudinary = require('../util/cloundinary');
-const { Post, Like, PostPicture, sequelize } = require('../models');
+const {
+  Post,
+  LikePost,
+  LikeComment,
+  PostPicture,
+  Comment,
+  User,
+  sequelize,
+} = require('../models');
 const { post } = require('../routes/registerRoute');
-
+const FriendService = require('../service/friendsService');
 exports.createPost = async (req, res, next) => {
   try {
-    const result = await sequelize.transaction(async (t) => {
+    let result;
+    await sequelize.transaction(async (t) => {
       const { detail } = req.body;
 
       let postId;
@@ -23,6 +32,7 @@ exports.createPost = async (req, res, next) => {
           userId: req.user.id,
         });
         postId = post.id;
+        result = post;
       }
       if (req.files?.postPicArr) {
         for (let pic of req.files?.postPicArr) {
@@ -119,12 +129,14 @@ exports.updatePost = async (req, res, next) => {
   }
 };
 exports.deletePost = async (req, res, next) => {
+  console.log('hahah');
+  let t;
   try {
     t = await sequelize.transaction();
-    const { postId, postPicId } = req.params;
+    const { postId } = req.params;
 
     const post = await Post.findOne({ where: { id: postId } });
-    const postPic = await PostPicture.fineOne({ where: { id: postPicId } });
+    // const postPic = await PostPicture.fineOne({ where: { id: postPicId } });
     if (!post) {
       createError('post not found', 400);
     }
@@ -134,32 +146,29 @@ exports.deletePost = async (req, res, next) => {
     //delete all post
     if (post) {
       await Comment.destroy({ where: { postId: postId } }, { transaction: t });
-      await Like.destroy({ where: { postId: postId } }, { transaction: t });
+      await LikePost.destroy({ where: { postId: postId } }, { transaction: t });
       await Post.destroy({ where: { id: postId } }, { transaction: t });
-      await PostPicture.destroy(
-        { where: { id: postPicId }, postId },
-        { transaction: t },
-      );
+      await PostPicture.destroy({ where: { postId } }, { transaction: t });
     }
     //delete detail
-    if (post.detail) {
-      await Post.destroy({ where: detail }, { transaction: t });
-    }
+    // if (post.detail) {
+    //   await Post.destroy({ where: detail }, { transaction: t });
+    // }
 
-    //postPic
+    // //postPic
 
-    if (!postPic) {
-      createError('post not found', 404);
-    }
-    if (!postId) {
-      createError('you have permission', 403);
-    }
-    if (postPic) {
-      await PostPicture.destroy(
-        { where: { id: postPicId }, postId },
-        { transaction: t },
-      );
-    }
+    // if (!postPic) {
+    //   createError('post not found', 404);
+    // }
+    // if (!postId) {
+    //   createError('you have permission', 403);
+    // }
+    // if (postPic) {
+    //   await PostPicture.destroy(
+    //     { where: { id: postPicId }, postId },
+    //     { transaction: t },
+    //   );
+    // }
     await t.commit();
     res.status(204).json();
   } catch (err) {
@@ -168,71 +177,119 @@ exports.deletePost = async (req, res, next) => {
   }
 };
 
-// exports.getUserPost = async (req, res, next) => {
-//   try {
-//     const userId = await FriendService.findFriendId(req.user.id); // [friendId1, friendId2, friendId3, ...]
-//     userId.push(req.user.id); // Add myId to userId => [friendId1, friendId2, friendId3, ..., myId]
+exports.getUserPost = async (req, res, next) => {
+  try {
+    const userId = await FriendService.findFriendId(req.user.id);
+    userId.push(req.user.id);
 
-//     // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
-//     const posts = await Post.findAll({
-//       where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
-//       order: [['updatedAt', 'DESC']],
-//       attributes: {
-//         exclude: ['userId'],
-//       },
-//       include: [
-//         {
-//           model: User,
-//           attributes: {
-//             exclude: [
-//               'password',
-//               'email',
-//               'phoneNumber',
-//               'coverPhoto',
-//               'createdAt',
-//             ],
-//           },
-//         },
-//         {
-//           model: Comment,
-//           attributes: {
-//             exclude: ['createdAt', 'userId'],
-//           },
-//           include: {
-//             model: User,
-//             attributes: {
-//               exclude: [
-//                 'password',
-//                 'email',
-//                 'phoneNumber',
-//                 'coverPhoto',
-//                 'createdAt',
-//               ],
-//             },
-//           },
-//         },
-//         {
-//           model: Like,
-//           attributes: {
-//             exclude: ['createdAt'],
-//           },
-//           include: {
-//             model: User,
-//             attributes: {
-//               exclude: [
-//                 'password',
-//                 'email',
-//                 'phoneNumber',
-//                 'coverPhoto',
-//                 'createdAt',
-//               ],
-//             },
-//           },
-//         },
-//       ],
-//     });
-//     res.json({ posts });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+    // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
+    const posts = await Post.findAll({
+      where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
+      order: [['updatedAt', 'DESC']],
+      attributes: {
+        exclude: ['userId'],
+      },
+      include: [
+        {
+          model: User,
+          attributes: {
+            exclude: [
+              'password',
+              'email',
+              'phoneNumber',
+              'coverPhoto',
+              'country',
+              'houseNumber',
+              'subDistrict',
+              'district',
+              'province',
+              'postCode',
+              'location',
+              'createdAt',
+            ],
+          },
+        },
+        {
+          model: Comment,
+          attributes: {
+            exclude: ['createdAt', 'userId'],
+          },
+          include: [
+            {
+              model: User,
+              attributes: {
+                exclude: [
+                  'password',
+                  'email',
+                  'phoneNumber',
+                  'coverPhoto',
+                  'country',
+                  'houseNumber',
+                  'subDistrict',
+                  'district',
+                  'province',
+                  'postCode',
+                  'location',
+                  'createdAt',
+                ],
+              },
+            },
+            {
+              model: LikeComment,
+              attributes: {
+                exclude: ['createdAt'],
+              },
+              include: {
+                model: User,
+                attributes: {
+                  exclude: [
+                    'password',
+                    'email',
+                    'phoneNumber',
+                    'coverPhoto',
+                    'createdAt',
+                    'country',
+                    'houseNumber',
+                    'subDistrict',
+                    'district',
+                    'province',
+                    'postCode',
+                    'location',
+                  ],
+                },
+              },
+            },
+          ],
+        },
+        {
+          model: LikePost,
+          attributes: {
+            exclude: ['createdAt'],
+          },
+          include: {
+            model: User,
+            attributes: {
+              exclude: [
+                'password',
+                'email',
+                'phoneNumber',
+                'coverPhoto',
+                'createdAt',
+                'country',
+                'houseNumber',
+                'subDistrict',
+                'district',
+                'province',
+                'postCode',
+                'location',
+              ],
+            },
+          },
+        },
+      ],
+    });
+    res.json({ posts });
+  } catch (err) {
+    next(err);
+  }
+};

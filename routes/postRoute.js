@@ -4,7 +4,10 @@ const router = express.Router();
 const postController = require('../controllers/postController');
 const authenticate = require('../middlewares/authenticate');
 const upload = require('../middlewares/upload');
+const postPicController = require('../controllers/postPicController');
 const { route } = require('./registerRoute');
+
+router.get('/me', authenticate, postController.getUserPost);
 router.post(
   '/',
   upload.fields([{ name: 'postPicArr', maxCount: 5 }]),
@@ -19,9 +22,5 @@ router.put(
 );
 router.delete('/:postId', authenticate, postController.deletePost);
 
-router.delete(
-  '/:postId/postPic:postPicId',
-  authenticate,
-  postController.deletePost,
-);
+router.delete('/:postPicId', authenticate, postPicController.deletepostPic);
 module.exports = router;

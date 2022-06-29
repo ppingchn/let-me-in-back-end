@@ -16,6 +16,7 @@ const errorMiddleware = require('./middlewares/error');
 const notFoundMiddleware = require('./middlewares/notFound');
 const authenticate = require('./middlewares/authenticate');
 const userRoute = require('./routes/userRoute');
+const followRoute = require('./routes/followRoute');
 
 const postRoute = require('./routes/postRoute');
 const postPicRoute = require('./routes/postPicRoute');
@@ -36,9 +37,6 @@ app.use('/login', loginRoute);
 app.use('/register', registerRoute);
 app.use('/users', authenticate, userRoute);
 
-app.use(notFoundMiddleware);
-app.use(errorMiddleware);
-
 //post
 app.use('/post', postRoute);
 
@@ -56,6 +54,11 @@ app.use('/likeComment', likeCommentRout);
 
 //reply
 app.use('/repliesComment', repliesCommentRoute);
+// app.use('/follow', authenticate, followRoute);
+app.use('/follow', authenticate, followRoute);
+
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
 
 app.listen(process.env.PORT, () => {
   console.log(`This server running on PORT ${process.env.PORT}`);

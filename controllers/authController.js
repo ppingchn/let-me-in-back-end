@@ -104,6 +104,25 @@ exports.register = async (req, res, next) => {
         createError('password did not match', 400);
       }
 
+      if (!country) {
+        createError('country is require', 400);
+      }
+      if (!houseNumber) {
+        createError('houseNumber is require', 400);
+      }
+      if (!subDistrict) {
+        createError('subDistrict is require', 400);
+      }
+      if (!district) {
+        createError('district is require', 400);
+      }
+      if (!province) {
+        createError('province is require', 400);
+      }
+      if (!postCode) {
+        createError('postCode is require', 400);
+      }
+
       // Make sure they gave use a valid phone number
       const isPhoneNumber = validator.isMobilePhone(phoneNumber + '');
       if (!isPhoneNumber) {
@@ -120,18 +139,18 @@ exports.register = async (req, res, next) => {
           role,
           email,
           phoneNumber,
+          password: hashedPassword,
           country,
           houseNumber,
           subDistrict,
           district,
           province,
           postCode,
-          password: hashedPassword,
         });
 
         //create Education
-
-        console.log(firstName, lastName, birthDate, gender, user.id);
+        // console.log('/n/n/n/n =============');
+        // console.log(firstName, lastName, birthDate, gender, user.id);
         if (role === 'user') {
           await UserDetail.create({
             firstName,
@@ -142,7 +161,7 @@ exports.register = async (req, res, next) => {
           });
 
           const eduArray = Object.values(JSON.parse(educationArray));
-          console.log(eduArray);
+          // console.log(eduArray);
 
           eduArray.map(
             async (el) =>
@@ -157,7 +176,7 @@ exports.register = async (req, res, next) => {
           );
 
           const experience = Object.values(JSON.parse(experienceArray));
-          console.log(experience);
+          // console.log(experience);
 
           experience.map(
             async (el) =>
@@ -195,10 +214,10 @@ exports.register = async (req, res, next) => {
             userId: user.id,
           });
         }
+        const token = createToken({ id: user.id });
+        res.status(201).json({ token });
       }
     });
-    const token = createToken({ id: User.id });
-    res.status(201).json({ token });
   } catch (err) {
     next(err);
   } finally {
