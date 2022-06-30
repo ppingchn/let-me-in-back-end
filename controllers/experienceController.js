@@ -2,6 +2,18 @@ const createError = require('../util/createError');
 
 const { Experience } = require('../models');
 
+exports.getExperience = async (req, res, next) => {
+  try {
+    const { experienceId } = req.params;
+    const experience = await Experience.findAll({
+      where: { userId: experienceId },
+    });
+    res.json({ experience });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createExperience = async (req, res, next) => {
   try {
     const {
@@ -30,6 +42,7 @@ exports.updateExperience = async (req, res, next) => {
   try {
     const { companyName, position, yearStart, yearEnd, userId } = req.body;
     const { experienceId } = req.params;
+    console.log(experienceId);
     const experience = await Experience.findOne({
       where: { id: experienceId },
     });
@@ -43,7 +56,7 @@ exports.updateExperience = async (req, res, next) => {
     next(error);
   }
 };
-exports.deleteExperience = async () => {
+exports.deleteExperience = async (req, res, next) => {
   try {
     const { experienceId } = req.params;
     const experience = await Experience.findOne({ whre: { id: experienceId } });

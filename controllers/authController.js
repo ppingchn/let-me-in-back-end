@@ -72,6 +72,7 @@ exports.register = async (req, res, next) => {
         province,
         postCode,
         location,
+        address,
       } = req.body;
 
       // console.log(birthDate);
