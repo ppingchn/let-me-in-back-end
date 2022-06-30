@@ -10,6 +10,19 @@ exports.getMe = async (req, res) => {
 
   res.json({ user });
 };
+exports.getCompanyByLetter = async (req, res, next) => {
+  try {
+    const { letter } = req.params;
+
+    const companies = await CompanyDetail.findAll({
+      where: { companyName: { [Op.like]: `%${letter}%` } },
+    });
+
+    res.json({ companies });
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.getUserById = async (req, res, next) => {
   try {
