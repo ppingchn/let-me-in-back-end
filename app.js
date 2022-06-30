@@ -17,8 +17,9 @@ const notFoundMiddleware = require('./middlewares/notFound');
 const authenticate = require('./middlewares/authenticate');
 const userRoute = require('./routes/userRoute');
 const followRoute = require('./routes/followRoute');
+const educationRoute = require('./routes/educationRoute');
 const experienceRoute = require('./routes/experienceRoute');
-const friendRouter =require('./routes/friendsRoute')
+const friendRouter = require('./routes/friendsRoute');
 const postRoute = require('./routes/postRoute');
 const postPicRoute = require('./routes/postPicRoute');
 const commentRoute = require('./routes/commentRoute');
@@ -44,11 +45,13 @@ app.use('/follow', authenticate, followRoute);
 app.use('/post', postRoute);
 app.use('/friends', authenticate, friendRouter);
 app.use('/follow', authenticate, followRoute);
+
+// add user detail
 app.use('/experience', authenticate, experienceRoute);
+app.use('/education', authenticate, educationRoute);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
-
 
 //postPic
 app.use('/postPic', postPicRoute);

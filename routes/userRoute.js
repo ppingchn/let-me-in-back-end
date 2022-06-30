@@ -15,6 +15,7 @@ router.get('/me', userController.getMe);
 //   userController.updateProfile,
 // );
 // router.get('/posts', postController.getUserPost);
-// router.get('/:userId', userController.getUserById);
+router.get('/companyByLetter/:letter', userController.getCompanyByLetter);
+router.get('/:userId', userController.getUserById);
 
 module.exports = router;
