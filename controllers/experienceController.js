@@ -1,6 +1,6 @@
 const createError = require('../util/createError');
 
-const { Experience } = require('../models');
+const { Experience, User, CompanyDetail } = require('../models');
 
 exports.getExperience = async (req, res, next) => {
   try {
@@ -8,7 +8,23 @@ exports.getExperience = async (req, res, next) => {
     const experience = await Experience.findAll({
       where: { userId: experienceId },
     });
-    res.json({ experience });
+
+    const result = JSON.parse(JSON.stringify(experience));
+
+    for (let i = 0; i < result.length; i++) {
+      const company = await CompanyDetail.findOne({
+        where: { companyName: result[i].companyName },
+        include: {
+          model: User,
+          attributes: {
+            exclude: ['password', 'username'],
+          },
+        },
+      });
+      result[i].company = company;
+    }
+
+    res.json({ result });
   } catch (error) {
     next(error);
   }
