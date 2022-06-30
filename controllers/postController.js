@@ -34,8 +34,9 @@ exports.createPost = async (req, res, next) => {
         postId = post.id;
         result = post;
       }
-      if (req.files?.postPicArr) {
-        for (let pic of req.files?.postPicArr) {
+      console.log(req.files);
+      if (req.files) {
+        for (let pic of req.files) {
           const result = await cloudinary.upload(pic.path);
 
           await PostPicture.create({
@@ -46,7 +47,6 @@ exports.createPost = async (req, res, next) => {
         }
       }
     });
-
     res.status(201).json(result);
   } catch (err) {
     next(err);
@@ -190,6 +190,7 @@ exports.getUserPost = async (req, res, next) => {
         exclude: ['userId'],
       },
       include: [
+        { model: PostPicture },
         {
           model: User,
           attributes: {
