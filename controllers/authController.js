@@ -47,7 +47,7 @@ exports.login = async (req, res, next) => {
 
 exports.register = async (req, res, next) => {
   try {
-    const result = await sequelize.transaction(async (t) => {
+    let result = await sequelize.transaction(async (t) => {
       const {
         username,
         password,
