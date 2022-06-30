@@ -10,7 +10,7 @@ const { route } = require('./registerRoute');
 router.get('/me', authenticate, postController.getUserPost);
 router.post(
   '/',
-  upload.fields([{ name: 'postPicArr', maxCount: 5 }]),
+  upload.array('postPicArr', 5),
   authenticate,
   postController.createPost,
 );
