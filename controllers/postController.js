@@ -190,6 +190,7 @@ exports.getUserPost = async (req, res, next) => {
         exclude: ['userId'],
       },
       include: [
+        { model: PostPicture },
         {
           model: User,
           attributes: {
