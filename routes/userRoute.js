@@ -12,6 +12,7 @@ router.put(
   userController.uploadCoverImage,
 );
 // router.get('/posts', postController.getUserPost);
+router.get('/allUserByLetter/:letter', userController.getAllUserByLetter);
 router.get('/companyByLetter/:letter', userController.getCompanyByLetter);
 router.get('/:userId', userController.getUserById);
 

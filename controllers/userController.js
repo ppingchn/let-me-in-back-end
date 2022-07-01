@@ -24,6 +24,30 @@ exports.getCompanyByLetter = async (req, res, next) => {
     next(err);
   }
 };
+exports.getAllUserByLetter = async (req, res, next) => {
+  try {
+    const { letter } = req.params;
+
+    const user = await UserDetail.findAll({
+      where: {
+        [Op.or]: [
+          { firstName: { [Op.like]: `%${letter}%` } },
+          { lastName: { [Op.like]: `%${letter}%` } },
+        ],
+      },
+      limit: 10,
+    });
+
+    const companies = await CompanyDetail.findAll({
+      where: { companyName: { [Op.like]: `%${letter}%` } },
+      limit: 10,
+    });
+
+    res.json({ user, companies });
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.getUserById = async (req, res, next) => {
   try {
