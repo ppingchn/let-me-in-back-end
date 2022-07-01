@@ -2,6 +2,7 @@ const fs = require('fs');
 const { Op } = require('sequelize');
 const { User, Friend, UserDetail, CompanyDetail } = require('../models');
 const FriendService = require('../service/friendsService');
+const cloudinary = require('../util/cloundinary');
 
 const createError = require('../util/createError');
 
@@ -60,5 +61,29 @@ exports.getUserById = async (req, res, next) => {
     res.json({ user: result });
   } catch (err) {
     next(err);
+  }
+};
+
+exports.uploadCoverImage = async (req, res, next) => {
+  try {
+    // console.log(req);
+    if (req.file) {
+      const { id } = req.user;
+
+      const result = await cloudinary.upload(req.file.path);
+      const postPic = result.secure_url;
+
+      const coverImage = User.update({ coverPic: postPic }, { where: { id } });
+
+      res.status(201).json({ coverImage });
+    } else {
+      createError('no file found', 400);
+    }
+  } catch (error) {
+    next(error);
+  } finally {
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
   }
 };
