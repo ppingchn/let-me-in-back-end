@@ -26,6 +26,7 @@ const commentRoute = require('./routes/commentRoute');
 const likeRout = require('./routes/likeRoute');
 const likeCommentRout = require('./routes/likeCommentRoute');
 const repliesCommentRoute = require('./routes/replyRoute');
+const chatMessageRoute = require('./routes/chatMessageRoute');
 
 const app = express();
 
@@ -65,6 +66,10 @@ app.use('/likeComment', likeCommentRout);
 //reply
 app.use('/repliesComment', repliesCommentRoute);
 // app.use('/follow', authenticate, followRoute);
+
+//chatMsg
+
+app.use('/chatMessage', chatMessageRoute);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
