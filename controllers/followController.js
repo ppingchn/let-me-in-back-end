@@ -1,9 +1,9 @@
 const express = require('express');
 const createError = require('../util/createError');
-const { Follow, User } = require('../models');
+const { Follow, User, CompanyDetail, UserDetail } = require('../models');
 const { Op } = require('sequelize');
 
-exports.getAllFollows = async (req, res, next) => {
+exports.getAllFollowing = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const follow = await Follow.findAll({
@@ -17,6 +17,7 @@ exports.getAllFollows = async (req, res, next) => {
           attributes: {
             exclude: ['password'],
           },
+          include: UserDetail,
         },
         {
           model: User,
@@ -24,6 +25,56 @@ exports.getAllFollows = async (req, res, next) => {
           attributes: {
             exclude: ['password'],
           },
+          include: CompanyDetail,
+        },
+        {
+          model: User,
+          as: 'FollowerUser',
+          attributes: {
+            exclude: ['password'],
+          },
+          include: UserDetail,
+        },
+      ],
+    });
+
+    res.json({ follow });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getAllFollower = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const follow = await Follow.findAll({
+      where: {
+        followerId: userId,
+      },
+      include: [
+        {
+          model: User,
+          as: 'User',
+          attributes: {
+            exclude: ['password'],
+          },
+          include: UserDetail,
+        },
+        {
+          model: User,
+          as: 'Company',
+          attributes: {
+            exclude: ['password'],
+          },
+          include: CompanyDetail,
+        },
+        {
+          model: User,
+          as: 'FollowerUser',
+          attributes: {
+            exclude: ['password'],
+          },
+          include: UserDetail,
         },
       ],
     });
@@ -36,9 +87,29 @@ exports.getAllFollows = async (req, res, next) => {
 
 exports.createFollows = async (req, res, next) => {
   try {
-    const { companyId } = req.body;
-    const follow = await Follow.create({ userId: req.user.id, companyId });
-    res.status(201).json({ follow });
+    const { id } = req.body;
+
+    const follower = await User.findOne({
+      where: { id },
+    });
+
+    if (req.user.id == id) {
+      createError('Cannot follow yourself.');
+    } else {
+      if (follower.role === 'user') {
+        const follow = await Follow.create({
+          userId: req.user.id,
+          followerId: id,
+        });
+        res.status(201).json({ follow });
+      } else if (follower.role === 'company') {
+        const follow = await Follow.create({
+          userId: req.user.id,
+          companyId: id,
+        });
+        res.status(201).json({ follow });
+      }
+    }
   } catch (error) {
     next(error);
   }

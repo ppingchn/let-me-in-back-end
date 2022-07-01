@@ -137,6 +137,15 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
     });
     User.hasMany(models.Follow, {
+      as: 'FollowerUser',
+      foreignKey: {
+        name: 'followerId',
+        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    User.hasMany(models.Follow, {
       as: 'User',
       foreignKey: {
         name: 'userId',

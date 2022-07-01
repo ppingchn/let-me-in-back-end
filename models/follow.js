@@ -5,7 +5,14 @@ module.exports = (sequelize, DataTypes) => {
       as: 'Company',
       foreignKey: {
         name: 'companyId',
-        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    Follow.belongsTo(models.User, {
+      as: 'FollowerUser',
+      foreignKey: {
+        name: 'followerId',
       },
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',

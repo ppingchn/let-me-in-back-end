@@ -3,7 +3,8 @@ const express = require("express");
 const router = express.Router();
 const followController = require("../controllers/followController");
 
-router.get("/", followController.getAllFollows);
+router.get("/following", followController.getAllFollowing);
+router.get("/follower", followController.getAllFollower);
 router.post("/", followController.createFollows);
 router.delete("/:companyId", followController.deleteFollows);
 
