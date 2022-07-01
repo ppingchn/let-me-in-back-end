@@ -16,7 +16,7 @@ router.post(
 );
 router.put(
   '/:postId',
-  upload.fields([{ name: 'postPicArray', maxCount: 5 }]),
+  upload.array('postPicArr', 5),
   authenticate,
   postController.updatePost,
 );
