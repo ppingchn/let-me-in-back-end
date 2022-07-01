@@ -1,7 +1,9 @@
 const fs = require('fs');
 const { Op } = require('sequelize');
-const { User } = require('../models');
+const { User, Friend, UserDetail, CompanyDetail } = require('../models');
+const FriendService = require('../service/friendsService');
 const cloudinary = require('../util/cloundinary');
+
 const createError = require('../util/createError');
 
 exports.getMe = async (req, res) => {
@@ -9,75 +11,103 @@ exports.getMe = async (req, res) => {
 
   res.json({ user });
 };
+exports.getCompanyByLetter = async (req, res, next) => {
+  try {
+    const { letter } = req.params;
 
-// exports.getUserById = async (req, res, next) => {
-//   try {
-//     const { userId } = req.params;
-//     const user = await User.findOne({
-//       where: { id: userId },
-//       attributes: { exclude: ['password'] },
-//     });
-//     console.log(user);
-//     if (!user) {
-//       createError('user not found', 400);
-//     }
-//     const result = JSON.parse(JSON.stringify(user));
-//     const friends = await FriendService.findAcceptedFriend(user.id);
-//     result.friends = friends;
+    const companies = await CompanyDetail.findAll({
+      where: { companyName: { [Op.like]: `%${letter}%` } },
+    });
 
-//     // SELECT * FROM friends WHERE (requestToId = userId AND requestFromId = req.user.id) OR (requestToId = req.user.id AND requestFromId = userId)
-//     const friend = await Friend.findOne({
-//       where: {
-//         [Op.or]: [
-//           { requestToId: user.id, requestFromId: req.user.id },
-//           { requestToId: req.user.id, requestFromId: user.id },
-//         ],
-//       },
-//     });
-//     result.friendStatus = friend;
-//     res.json({ user: result });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+    res.json({ companies });
+  } catch (err) {
+    next(err);
+  }
+};
+exports.getAllUserByLetter = async (req, res, next) => {
+  try {
+    const { letter } = req.params;
 
-// exports.updateProfile = async (req, res, next) => {
-//   try {
-//     if (!req.files) {
-//       createError('profilePic or coverPhoto is required', 400);
-//     }
+    const user = await UserDetail.findAll({
+      where: {
+        [Op.or]: [
+          { firstName: { [Op.like]: `%${letter}%` } },
+          { lastName: { [Op.like]: `%${letter}%` } },
+        ],
+      },
+      limit: 10,
+    });
 
-//     const updateValue = {};
-//     if (req.files.profilePic) {
-//       const result = await cloudinary.upload(req.files.profilePic[0].path);
-//       if (req.user.profilePic) {
-//         const splited = req.user.profilePic.split('/');
-//         const publicId = splited[splited.length - 1].split('.')[0];
-//         await cloudinary.destroy(publicId);
-//       }
-//       updateValue.profilePic = result.secure_url;
-//     }
+    const companies = await CompanyDetail.findAll({
+      where: { companyName: { [Op.like]: `%${letter}%` } },
+      limit: 10,
+    });
 
-//     if (req.files.coverPhoto) {
-//       const result = await cloudinary.upload(req.files.coverPhoto[0].path);
-//       if (req.user.coverPhoto) {
-//         const splited = req.user.coverPhoto.split('/');
-//         const publicId = splited[splited.length - 1].split('.')[0];
-//         await cloudinary.destroy(publicId);
-//       }
-//       updateValue.coverPhoto = result.secure_url;
-//     }
+    res.json({ user, companies });
+  } catch (err) {
+    next(err);
+  }
+};
 
-//     await User.update(updateValue, { where: { id: req.user.id } });
-//     res.json(updateValue);
-//   } catch (err) {
-//     next(err);
-//   } finally {
-//     if (req.files.profilePic) {
-//       fs.unlinkSync(req.files.profilePic[0].path);
-//     }
-//     if (req.files.coverPhoto) {
-//       fs.unlinkSync(req.files.coverPhoto[0].path);
-//     }
-//   }
-// };
+exports.getUserById = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findOne({
+      where: { id: userId },
+      attributes: {
+        exclude: ['password'],
+      },
+    });
+
+    if (!user) {
+      createError('user not found', 400);
+    }
+    const result = JSON.parse(JSON.stringify(user));
+
+    const userDetail = await UserDetail.findOne({ where: { userId } });
+    result.userDetail = userDetail;
+
+    const companyDetail = await CompanyDetail.findOne({ where: { userId } });
+    result.companyDetail = companyDetail;
+
+    const friends = await FriendService.findAcceptedFriend(user.id);
+    result.friends = friends;
+
+    const friend = await Friend.findOne({
+      where: {
+        [Op.or]: [
+          { requestToId: user.id, requestFromId: req.user.id },
+          { requestToId: req.user.id, requestFromId: user.id },
+        ],
+      },
+    });
+    result.friendStatus = friend;
+    res.json({ user: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.uploadCoverImage = async (req, res, next) => {
+  try {
+    // console.log(req);
+    if (req.file) {
+      const { id } = req.user;
+
+      const result = await cloudinary.upload(req.file.path);
+      const postPic = result.secure_url;
+
+      const coverImage = User.update({ coverPic: postPic }, { where: { id } });
+
+      res.status(201).json({ coverImage });
+    } else {
+      createError('no file found', 400);
+    }
+  } catch (error) {
+    next(error);
+  } finally {
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+  }
+};

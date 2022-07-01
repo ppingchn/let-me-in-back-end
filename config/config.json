@@ -1,7 +1,11 @@
 {
   "development": {
     "username": "root",
+<<<<<<< HEAD
     "password": "friend301",
+=======
+    "password": "12345678",
+>>>>>>> 038ef4752792fc1bf983aef298b6d88776696f02
     "database": "let-me-in",
     "host": "127.0.0.1",
     "dialect": "mysql"

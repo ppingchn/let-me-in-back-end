@@ -8,6 +8,7 @@ const {
   PostPicture,
   Comment,
   User,
+  Reply,
   sequelize,
 } = require('../models');
 const { post } = require('../routes/registerRoute');
@@ -34,8 +35,9 @@ exports.createPost = async (req, res, next) => {
         postId = post.id;
         result = post;
       }
-      if (req.files?.postPicArr) {
-        for (let pic of req.files?.postPicArr) {
+      console.log(req.files);
+      if (req.files) {
+        for (let pic of req.files) {
           const result = await cloudinary.upload(pic.path);
 
           await PostPicture.create({
@@ -46,7 +48,6 @@ exports.createPost = async (req, res, next) => {
         }
       }
     });
-
     res.status(201).json(result);
   } catch (err) {
     next(err);
@@ -58,6 +59,8 @@ exports.createPost = async (req, res, next) => {
 };
 exports.updatePost = async (req, res, next) => {
   try {
+    console.log(req.user.id);
+
     const result = await sequelize.transaction(async (t) => {
       const { postId } = req.params;
       const { detail, postPicIdArray } = req.body;
@@ -67,19 +70,19 @@ exports.updatePost = async (req, res, next) => {
       const picArray = [];
       // console.log('*************');
 
-      for (let i = 0; i < postPicArray.length; i++) {
-        // console.log(JSON.parse(postPicIdArray)[i]);
-        // console.log('-------------');
-        // console.log(postPicArray[i]);
-        if (JSON.parse(postPicIdArray)[i]) {
-          picArray.push({
-            id: JSON.parse(postPicIdArray)[i],
-            file: postPicArray[i].path,
-          });
-        } else {
-          picArray.push({ file: postPicArray[i].path });
-        }
-      }
+      // for (let i = 0; i < postPicArray.length; i++) {
+      //   // console.log(JSON.parse(postPicIdArray)[i]);
+      //   // console.log('-------------');
+      //   // console.log(postPicArray[i]);
+      //   if (JSON.parse(postPicIdArray)[i]) {
+      //     picArray.push({
+      //       id: JSON.parse(postPicIdArray)[i],
+      //       file: postPicArray[i].path,
+      //     });
+      //   } else {
+      //     picArray.push({ file: postPicArray[i].path });
+      //   }
+      // }
 
       if (!detail) {
         createError('detail is required', 400);
@@ -216,6 +219,9 @@ exports.getUserPost = async (req, res, next) => {
             exclude: ['createdAt', 'userId'],
           },
           include: [
+            {
+              model: Reply,
+            },
             {
               model: User,
               attributes: {

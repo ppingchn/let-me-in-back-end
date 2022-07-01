@@ -1,15 +1,31 @@
-const createError = require("../utils/createError");
+const createError = require('../util/createError');
+const { Education } = require('../models');
+
+exports.getEducationById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const educations = await Education.findAll({
+      where: { userId: id },
+    });
+    res.json({ educations });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createEducation = async (req, res, next) => {
   try {
-    const { userId, degree, university, feild, yearStart, yearEnd } = req.body;
+    const { degree, university, field, yearStart, yearEnd } = req.body;
+    const { id } = req.user;
     const education = await Education.create({
-      userId,
+      userId: id,
       degree,
       university,
-      feild,
+      field,
       yearStart,
       yearEnd,
     });
+    res.json({ education });
   } catch (error) {
     next(error);
   }
@@ -21,24 +37,25 @@ exports.updateEducation = async (req, res, next) => {
     const { educationId } = req.params;
     const education = await Education.findOne({ where: { id: educationId } });
     if (!education) {
-      createError("Education not found", 404);
+      createError('Education not found', 404);
     }
     bodyUpdate = { degree, university, feild, yearStart, yearEnd };
     await education.update(bodyUpdate);
-    resizeBy.json({ education });
+    res.json({ education });
   } catch (error) {
     next(error);
   }
 };
+
 exports.deleleEducation = async (req, res, next) => {
   try {
     const { educationId } = req.params;
     const education = await Education.findOne({ where: { id: educationId } });
     if (!education) {
-      createError("Education not found", 404);
+      createError('Education not found', 404);
     }
     await education.destroy();
-    resizeBy.status(204).json();
+    res.status(204).json();
   } catch (error) {
     next(error);
   }
