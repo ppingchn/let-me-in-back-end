@@ -50,9 +50,6 @@ app.use('/follow', authenticate, followRoute);
 app.use('/experience', authenticate, experienceRoute);
 app.use('/education', authenticate, educationRoute);
 
-app.use(notFoundMiddleware);
-app.use(errorMiddleware);
-
 //postPic
 app.use('/postPic', postPicRoute);
 

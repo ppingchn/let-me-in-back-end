@@ -8,6 +8,7 @@ const {
   PostPicture,
   Comment,
   User,
+  Reply,
   sequelize,
 } = require('../models');
 const { post } = require('../routes/registerRoute');
@@ -218,6 +219,9 @@ exports.getUserPost = async (req, res, next) => {
             exclude: ['createdAt', 'userId'],
           },
           include: [
+            {
+              model: Reply,
+            },
             {
               model: User,
               attributes: {
