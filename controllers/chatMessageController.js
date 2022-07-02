@@ -32,3 +32,19 @@ exports.deleteChatMessage = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getMessage = async (req, res, next) => {
+  console.log('555');
+  try {
+    const { chatMessageId } = req.params;
+    const msg = await ChatMessage.findOne({
+      where: { id: chatMessageId },
+      attributes: {
+        exclude: ['createdAt', 'updatedAt', 'senderId', 'receiverId', 'id'],
+      },
+    });
+    res.status(201).json({ msg });
+  } catch (error) {
+    next(error);
+  }
+};

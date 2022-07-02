@@ -1,6 +1,8 @@
 // Libary import
 require('dotenv').config();
 const express = require('express');
+const socketio = require('socket.io');
+const http = require('http');
 
 const cors = require('cors');
 
@@ -29,6 +31,15 @@ const repliesCommentRoute = require('./routes/replyRoute');
 const chatMessageRoute = require('./routes/chatMessageRoute');
 
 const app = express();
+
+//socket io
+const server = http.createServer(app);
+//make connection to io and config cor
+const io = socketio(server, {
+  cors: {
+    origin: '*',
+  },
+});
 
 // middleware
 app.use(cors());
@@ -71,9 +82,18 @@ app.use('/repliesComment', repliesCommentRoute);
 
 app.use('/chatMessage', chatMessageRoute);
 
+// socket io
+io.on('connection', (socket) => {
+  //create event to client
+  socket.on('chat', (payload) => {
+    console.log('what is payload', payload);
+    io.emit('chat', payload);
+  });
+});
+
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
   console.log(`This server running on PORT ${process.env.PORT}`);
 });
