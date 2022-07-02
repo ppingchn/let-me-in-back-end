@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Friend, User } = require('../models');
+const { Friend, User, Follow } = require('../models');
 const { FRIEND_ACCEPTED, FRIEND_PENDING } = require('../config/constants');
 const FriendService = require('../service/friendsService');
 const createError = require('../util/createError');
@@ -30,33 +30,46 @@ exports.getAllFriend = async (req, res, next) => {
 
 exports.findFriendId = async (req, res, next) => {
   try {
-    const {requestToId} = req.params;
+    const { id } = req.params;
 
-    if (req.user.id === +requestToId) {
+    if (req.user.id === +id) {
       createError('cannot request yourself', 400);
     }
 
-    const existFriend = await Friend.findOne({
-      where: {
-        [Op.or]: [
-          { requestFromId: req.user.id, requestToId: requestToId },
-          { requestFromId: requestToId, requestToId: req.user.id },
-        ],
-      },
-    });
+    // const existFriend = await Friend.findOne({
+    //   where: {
+    //     [Op.or]: [
+    //       { requestFromId: req.user.id, requestToId: requestToId },
+    //       { requestFromId: requestToId, requestToId: req.user.id },
+    //     ],
+    //   },
+    // });
 
-    console.log(existFriend)
-    if (!existFriend) {
-      createError('this user is not a friend yet', 400);
-    }
+    // console.log(existFriend);
+    // if (!existFriend) {
+    //   createError('this user is not a friend yet', 400);
+    // }
 
-    
+    // const friends = await Friend.findAll({
+    //   where: {
+    //     [Op.and]: [
+    //       { requestToId: requestToId },
+    //       { requestFromId: req.user.id },
+    //     ],
+    //     status: FRIEND_ACCEPTED,
+    //   },
+    // });
+
     const friends = await Friend.findAll({
       where: {
-        [Op.and]: [{ requestToId: requestToId }, { requestFromId: req.user.id }],
+        [Op.or]: [{ requestToId: id }, { requestFromId: id }],
+
         status: FRIEND_ACCEPTED,
       },
     });
+    // const friendIds = friends.map((el) =>
+    //   el.requestToId === id ? el.requestFromId : el.requestToId,
+    // );
 
     res.json({ friends });
   } catch (err) {
@@ -98,11 +111,11 @@ exports.requestFriend = async (req, res, next) => {
 
 exports.updateFriend = async (req, res, next) => {
   try {
-    const { requestToId } = req.params;
+    const { requestFromId } = req.params;
     const friend = await Friend.findOne({
       where: {
-        requestFromId: req.user.id,
-        requestToId,
+        requestToId: req.user.id,
+        requestFromId,
         status: FRIEND_PENDING,
       },
     });
@@ -113,8 +126,25 @@ exports.updateFriend = async (req, res, next) => {
 
     friend.status = FRIEND_ACCEPTED;
     await friend.save();
+
+    const follower = await User.findOne({
+      where: { id: requestFromId },
+    });
+
+    if (req.user.id == requestFromId) {
+      createError('Cannot follow yourself.');
+    } else {
+      if (follower.role === 'user') {
+        const follow = await Follow.create({
+          userId: requestFromId,
+          followerId: req.user.id,
+        });
+        res.json({ message: 'friend request accepted' });
+        // res.status(201).json({ follow });
+      }
+    }
+
     // await Friend.update({ status: FRIEND_ACCEPTED }, { where: { id: friend.id } })
-    res.json({ message: 'friend request accepted' });
   } catch (err) {
     next(err);
   }
