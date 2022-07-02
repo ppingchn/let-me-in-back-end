@@ -34,6 +34,18 @@ exports.getAllFollows = async (req, res, next) => {
   }
 };
 
+exports.getFollowById = async (req, res, next) => {
+  try {
+    const { companyId } = req.params;
+    const { id } = req.user;
+    const follow = await Follow.findOne({ companyId, userId: id });
+
+    res.status(201).json({ follow });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createFollows = async (req, res, next) => {
   try {
     const { companyId } = req.body;
