@@ -7,7 +7,7 @@ const authenticate = require('../middlewares/authenticate');
 router.post('/', authenticate, likeCommentController.createLikeComment);
 
 router.delete(
-  '/comment/:commentId/likesComment/:likeCommentId',
+  '/comment/:commentId',
   authenticate,
   likeCommentController.deleteLikeComment,
 );
