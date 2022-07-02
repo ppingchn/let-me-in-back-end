@@ -26,6 +26,7 @@ const commentRoute = require('./routes/commentRoute');
 const likeRout = require('./routes/likeRoute');
 const likeCommentRout = require('./routes/likeCommentRoute');
 const repliesCommentRoute = require('./routes/replyRoute');
+const jobApplyRoute = require('./routes/jobApplyRoute');
 
 const app = express();
 
@@ -49,6 +50,9 @@ app.use('/follow', authenticate, followRoute);
 // add user detail
 app.use('/experience', authenticate, experienceRoute);
 app.use('/education', authenticate, educationRoute);
+
+//job
+app.use('/job', authenticate, jobApplyRoute);
 
 //postPic
 app.use('/postPic', postPicRoute);
