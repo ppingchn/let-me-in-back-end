@@ -221,6 +221,27 @@ exports.getUserPost = async (req, res, next) => {
           include: [
             {
               model: Reply,
+              include: [
+                {
+                  model: User,
+                  attributes: {
+                    exclude: [
+                      'password',
+                      'email',
+                      'phoneNumber',
+                      'coverPhoto',
+                      'country',
+                      'houseNumber',
+                      'subDistrict',
+                      'district',
+                      'province',
+                      'postCode',
+                      'location',
+                      'createdAt',
+                    ],
+                  },
+                },
+              ],
             },
             {
               model: User,
