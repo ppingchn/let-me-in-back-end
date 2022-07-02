@@ -11,6 +11,7 @@ exports.getMe = async (req, res) => {
 
   res.json({ user });
 };
+
 exports.getCompanyByLetter = async (req, res, next) => {
   try {
     const { letter } = req.params;
@@ -24,6 +25,7 @@ exports.getCompanyByLetter = async (req, res, next) => {
     next(err);
   }
 };
+
 exports.getAllUserByLetter = async (req, res, next) => {
   try {
     const { letter } = req.params;
