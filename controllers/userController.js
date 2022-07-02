@@ -2,6 +2,7 @@ const fs = require('fs');
 const { Op } = require('sequelize');
 const { User, Friend, UserDetail, CompanyDetail } = require('../models');
 const FriendService = require('../service/friendsService');
+const cloudinary = require('../util/cloundinary');
 
 const createError = require('../util/createError');
 
@@ -10,6 +11,7 @@ exports.getMe = async (req, res) => {
 
   res.json({ user });
 };
+
 exports.getCompanyByLetter = async (req, res, next) => {
   try {
     const { letter } = req.params;
@@ -19,6 +21,31 @@ exports.getCompanyByLetter = async (req, res, next) => {
     });
 
     res.json({ companies });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getAllUserByLetter = async (req, res, next) => {
+  try {
+    const { letter } = req.params;
+
+    const user = await UserDetail.findAll({
+      where: {
+        [Op.or]: [
+          { firstName: { [Op.like]: `%${letter}%` } },
+          { lastName: { [Op.like]: `%${letter}%` } },
+        ],
+      },
+      limit: 10,
+    });
+
+    const companies = await CompanyDetail.findAll({
+      where: { companyName: { [Op.like]: `%${letter}%` } },
+      limit: 10,
+    });
+
+    res.json({ user, companies });
   } catch (err) {
     next(err);
   }
@@ -60,5 +87,29 @@ exports.getUserById = async (req, res, next) => {
     res.json({ user: result });
   } catch (err) {
     next(err);
+  }
+};
+
+exports.uploadCoverImage = async (req, res, next) => {
+  try {
+    // console.log(req);
+    if (req.file) {
+      const { id } = req.user;
+
+      const result = await cloudinary.upload(req.file.path);
+      const postPic = result.secure_url;
+
+      const coverImage = User.update({ coverPic: postPic }, { where: { id } });
+
+      res.status(201).json({ coverImage });
+    } else {
+      createError('no file found', 400);
+    }
+  } catch (error) {
+    next(error);
+  } finally {
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
   }
 };

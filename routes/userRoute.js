@@ -6,15 +6,13 @@ const upload = require('../middlewares/upload');
 const router = express.Router();
 
 router.get('/me', userController.getMe);
-// router.patch(
-//   '/',
-//   upload.fields([
-//     { name: 'profilePic', maxCount: 1 },
-//     { name: 'coverPhoto', maxCount: 1 },
-//   ]),
-//   userController.updateProfile,
-// );
+router.put(
+  '/coverImage',
+  upload.single('coverImage'),
+  userController.uploadCoverImage,
+);
 // router.get('/posts', postController.getUserPost);
+router.get('/allUserByLetter/:letter', userController.getAllUserByLetter);
 router.get('/companyByLetter/:letter', userController.getCompanyByLetter);
 router.get('/:userId', userController.getUserById);
 

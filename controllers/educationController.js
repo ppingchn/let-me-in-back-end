@@ -41,11 +41,12 @@ exports.updateEducation = async (req, res, next) => {
     }
     bodyUpdate = { degree, university, feild, yearStart, yearEnd };
     await education.update(bodyUpdate);
-    resizeBy.json({ education });
+    res.json({ education });
   } catch (error) {
     next(error);
   }
 };
+
 exports.deleleEducation = async (req, res, next) => {
   try {
     const { educationId } = req.params;
@@ -54,7 +55,7 @@ exports.deleleEducation = async (req, res, next) => {
       createError('Education not found', 404);
     }
     await education.destroy();
-    resizeBy.status(204).json();
+    res.status(204).json();
   } catch (error) {
     next(error);
   }

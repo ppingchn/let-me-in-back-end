@@ -8,6 +8,7 @@ const {
   PostPicture,
   Comment,
   User,
+  Reply,
   sequelize,
 } = require('../models');
 const { post } = require('../routes/registerRoute');
@@ -58,6 +59,8 @@ exports.createPost = async (req, res, next) => {
 };
 exports.updatePost = async (req, res, next) => {
   try {
+    console.log(req.user.id);
+
     const result = await sequelize.transaction(async (t) => {
       const { postId } = req.params;
       const { detail, postPicIdArray } = req.body;
@@ -67,19 +70,19 @@ exports.updatePost = async (req, res, next) => {
       const picArray = [];
       // console.log('*************');
 
-      for (let i = 0; i < postPicArray.length; i++) {
-        // console.log(JSON.parse(postPicIdArray)[i]);
-        // console.log('-------------');
-        // console.log(postPicArray[i]);
-        if (JSON.parse(postPicIdArray)[i]) {
-          picArray.push({
-            id: JSON.parse(postPicIdArray)[i],
-            file: postPicArray[i].path,
-          });
-        } else {
-          picArray.push({ file: postPicArray[i].path });
-        }
-      }
+      // for (let i = 0; i < postPicArray.length; i++) {
+      //   // console.log(JSON.parse(postPicIdArray)[i]);
+      //   // console.log('-------------');
+      //   // console.log(postPicArray[i]);
+      //   if (JSON.parse(postPicIdArray)[i]) {
+      //     picArray.push({
+      //       id: JSON.parse(postPicIdArray)[i],
+      //       file: postPicArray[i].path,
+      //     });
+      //   } else {
+      //     picArray.push({ file: postPicArray[i].path });
+      //   }
+      // }
 
       if (!detail) {
         createError('detail is required', 400);
@@ -185,7 +188,7 @@ exports.getUserPost = async (req, res, next) => {
     // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
     const posts = await Post.findAll({
       where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
-      order: [['updatedAt', 'DESC']],
+      order: [['createdAt', 'DESC']],
       attributes: {
         exclude: ['userId'],
       },
@@ -216,6 +219,30 @@ exports.getUserPost = async (req, res, next) => {
             exclude: ['createdAt', 'userId'],
           },
           include: [
+            {
+              model: Reply,
+              include: [
+                {
+                  model: User,
+                  attributes: {
+                    exclude: [
+                      'password',
+                      'email',
+                      'phoneNumber',
+                      'coverPhoto',
+                      'country',
+                      'houseNumber',
+                      'subDistrict',
+                      'district',
+                      'province',
+                      'postCode',
+                      'location',
+                      'createdAt',
+                    ],
+                  },
+                },
+              ],
+            },
             {
               model: User,
               attributes: {

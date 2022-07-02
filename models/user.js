@@ -208,6 +208,24 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
+    User.hasMany(models.JobAlert, {
+      as: 'CompanyJobAlert',
+      foreignKey: {
+        name: 'companyId',
+        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    User.hasMany(models.JobAlert, {
+      as: 'UserJobAlert',
+      foreignKey: {
+        name: 'userId',
+        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
     User.hasMany(models.LikeComment, {
       foreignKey: {
         name: 'userId',

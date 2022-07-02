@@ -82,8 +82,7 @@ exports.getAllFollower = async (req, res, next) => {
         ],
       });
       res.json({ follow });
-
-    }else if(role === 'company'){
+    } else if (role === 'company') {
       const follow = await Follow.findAll({
         where: {
           companyId: userId,
@@ -117,9 +116,20 @@ exports.getAllFollower = async (req, res, next) => {
       });
       res.json({ follow });
     }
-
   } catch (err) {
     next(err);
+  }
+};
+
+exports.getFollowById = async (req, res, next) => {
+  try {
+    const { companyId } = req.params;
+    const { id } = req.user;
+    const follow = await Follow.findOne({ companyId, userId: id });
+
+    res.status(201).json({ follow });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -158,7 +168,7 @@ exports.deleteFollows = async (req, res, next) => {
     const userId = req.user.id;
     const { id } = req.params;
     // const { companyId } = req.params;
-    
+
     const company = await Follow.findOne({
       where: {
         [Op.and]: [
