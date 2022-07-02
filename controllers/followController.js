@@ -47,39 +47,77 @@ exports.getAllFollowing = async (req, res, next) => {
 exports.getAllFollower = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const follow = await Follow.findAll({
-      where: {
-        followerId: userId,
-      },
-      include: [
-        {
-          model: User,
-          as: 'User',
-          attributes: {
-            exclude: ['password'],
-          },
-          include: UserDetail,
-        },
-        {
-          model: User,
-          as: 'Company',
-          attributes: {
-            exclude: ['password'],
-          },
-          include: CompanyDetail,
-        },
-        {
-          model: User,
-          as: 'FollowerUser',
-          attributes: {
-            exclude: ['password'],
-          },
-          include: UserDetail,
-        },
-      ],
-    });
+    const role = req.user.role;
 
-    res.json({ follow });
+    if (role === 'user') {
+      const follow = await Follow.findAll({
+        where: {
+          followerId: userId,
+        },
+        include: [
+          {
+            model: User,
+            as: 'User',
+            attributes: {
+              exclude: ['password'],
+            },
+            include: UserDetail,
+          },
+          {
+            model: User,
+            as: 'Company',
+            attributes: {
+              exclude: ['password'],
+            },
+            include: CompanyDetail,
+          },
+          {
+            model: User,
+            as: 'FollowerUser',
+            attributes: {
+              exclude: ['password'],
+            },
+            include: UserDetail,
+          },
+        ],
+      });
+      res.json({ follow });
+
+    }else if(role === 'company'){
+      const follow = await Follow.findAll({
+        where: {
+          companyId: userId,
+        },
+        include: [
+          {
+            model: User,
+            as: 'User',
+            attributes: {
+              exclude: ['password'],
+            },
+            include: UserDetail,
+          },
+          {
+            model: User,
+            as: 'Company',
+            attributes: {
+              exclude: ['password'],
+            },
+            include: CompanyDetail,
+          },
+          {
+            model: User,
+            as: 'FollowerUser',
+            attributes: {
+              exclude: ['password'],
+            },
+            include: UserDetail,
+          },
+        ],
+      });
+      res.json({ follow });
+    }
+
   } catch (err) {
     next(err);
   }
@@ -118,12 +156,19 @@ exports.createFollows = async (req, res, next) => {
 exports.deleteFollows = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { companyId } = req.params;
+    const { id } = req.params;
+    // const { companyId } = req.params;
+    
     const company = await Follow.findOne({
-      where: { [Op.and]: [{ companyId }, { userId }] },
+      where: {
+        [Op.and]: [
+          { [Op.or]: [{ followerId: id }, { companyId: id }] },
+          { [Op.or]: [{ userId }, { followerId: userId }] },
+        ],
+      },
     });
     if (!company) {
-      createError('Company not found', 404);
+      createError('Company or Follower is not found', 404);
     }
     await company.destroy();
     res.status(204).json();

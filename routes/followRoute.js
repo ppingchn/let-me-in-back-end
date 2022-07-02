@@ -6,6 +6,6 @@ const followController = require("../controllers/followController");
 router.get("/following", followController.getAllFollowing);
 router.get("/follower", followController.getAllFollower);
 router.post("/", followController.createFollows);
-router.delete("/:companyId", followController.deleteFollows);
+router.delete("/:id", followController.deleteFollows);
 
 module.exports = router;
