@@ -8,5 +8,22 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
   });
+  Reply.associate = (models) => {
+    Reply.belongsTo(models.User, {
+      foreignKey: {
+        name: 'userId',
+        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    Reply.belongsTo(models.Comment, {
+      foreignKey: {
+        name: 'commentId',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+  };
   return Reply;
 };
