@@ -22,6 +22,21 @@ exports.createJobAlert = async (req, res, next) => {
   }
 };
 
+exports.getJobAlertById = async (req, res, next) => {
+  try {
+    const { companyId } = req.params;
+    const { id } = req.user;
+
+    const jobAlert = await JobAlert.findOne({
+      where: { companyId, userId: id },
+    });
+
+    res.json({ jobAlert });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createJobApply = async (req, res, next) => {
   try {
     const { jobListId, userId } = req.body;
