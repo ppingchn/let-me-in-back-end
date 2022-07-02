@@ -5,10 +5,9 @@ const friendController = require('../controllers/friendController');
 
 router.get('/', friendController.getAllFriend);
 router.get('/:id', friendController.findFriendId);
-router.post('/', friendController.requestFriend);
+router.post('/:requestToId', friendController.requestFriend);
 router.patch('/:requestFromId', friendController.updateFriend);
 
-//friendId
-router.delete('/:id', friendController.deleteFriend);
+router.delete('/:requestFromId', friendController.deleteFriend);
 
 module.exports = router;

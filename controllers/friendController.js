@@ -7,6 +7,7 @@ const createError = require('../util/createError');
 exports.getAllFriend = async (req, res, next) => {
   try {
     const { status } = req.query;
+    console.log(status);
     let users = [];
     if (status?.toUpperCase() === 'UNKNOWN') {
       // **** FIND UNKNOWN
@@ -79,7 +80,7 @@ exports.findFriendId = async (req, res, next) => {
 
 exports.requestFriend = async (req, res, next) => {
   try {
-    const { requestToId } = req.body;
+    const { requestToId } = req.params;
 
     if (req.user.id === +requestToId) {
       createError('cannot request yourself', 400);
@@ -152,9 +153,11 @@ exports.updateFriend = async (req, res, next) => {
 
 exports.deleteFriend = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { requestFromId } = req.params;
 
-    const friend = await Friend.findOne({ where: { id } });
+    const friend = await Friend.findOne({
+      where: { [Op.and]: [{ requestFromId }, { requestToId: req.user.id }] },
+    });
 
     if (!friend) {
       createError('friend request not found', 400);
