@@ -137,6 +137,15 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
     });
     User.hasMany(models.Follow, {
+      as: 'FollowerUser',
+      foreignKey: {
+        name: 'followerId',
+        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    User.hasMany(models.Follow, {
       as: 'User',
       foreignKey: {
         name: 'userId',
@@ -176,6 +185,42 @@ module.exports = (sequelize, DataTypes) => {
       as: 'SecondUser',
       foreignKey: {
         name: 'secondUserId',
+        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    User.hasMany(models.ChatMessage, {
+      as: 'Sender',
+      foreignKey: {
+        name: 'senderId',
+        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    User.hasMany(models.ChatMessage, {
+      as: 'Receive',
+      foreignKey: {
+        name: 'receiverId',
+        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    User.hasMany(models.JobAlert, {
+      as: 'CompanyJobAlert',
+      foreignKey: {
+        name: 'companyId',
+        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    User.hasMany(models.JobAlert, {
+      as: 'UserJobAlert',
+      foreignKey: {
+        name: 'userId',
         allowNull: false,
       },
       onDelete: 'CASCADE',
