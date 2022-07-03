@@ -1,11 +1,16 @@
-const express = require("express");
+const express = require('express');
 
 const router = express.Router();
-const chatRoomController = require("../controllers/chatRoomController");
+const chatRoomController = require('../controllers/chatRoomController');
+const authenticate = require('../middlewares/authenticate');
 
-router.get("/");
-router.post("/", chatRoomController.createchatRoom);
-router.put("/:chatRoomId", chatRoomController.updatechatRoom);
-router.delete("/:chatRoomId", chatRoomController.deletechatRoom);
+router.get('/', authenticate, chatRoomController.listChatRoomController);
+router.post('/', authenticate, chatRoomController.createChatRoomController);
+
+router.delete(
+  '/:chatRoomId',
+  authenticate,
+  chatRoomController.deleteChatRoomController,
+);
 
 module.exports = router;

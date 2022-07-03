@@ -18,10 +18,9 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
-    ChatMessage.belongsTo(models.User, {
-      as: 'Receive',
+    ChatMessage.belongsTo(models.ChatRoom, {
       foreignKey: {
-        name: 'receiverId',
+        name: 'chatRoomId',
         allowNull: false,
       },
       onDelete: 'CASCADE',
