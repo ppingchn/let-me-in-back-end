@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Friend, User } = require('../models');
+const { Friend, User, UserDetail } = require('../models');
 const { FRIEND_ACCEPTED, FRIEND_PENDING } = require('../config/constants');
 
 exports.findFriendId = async (id) => {
@@ -32,6 +32,7 @@ exports.findAcceptedFriend = async (id) => {
   const users = await User.findAll({
     where: { id: friendIds },
     attributes: { exclude: ['password'] },
+    include: { model: UserDetail },
   });
 
   return users;
@@ -48,21 +49,12 @@ exports.findPendingFriend = async (id) => {
       model: User,
       as: 'RequestFrom',
       attributes: {
-        exclude: [
-          'password',
-          // 'email',
-          // 'phonenUmber',
-          // 'detail',
-          // 'country',
-          // 'houseNumber',
-          // 'subDistrict',
-          // 'district',
-          // 'province',
-          // 'postCode',
-        ],
+        exclude: ['password'],
       },
+      include: UserDetail,
     },
   });
+  console.log(friends);
   return friends.map((el) => el.RequestFrom);
 };
 
@@ -79,6 +71,7 @@ exports.findRequestFriend = async (id) => {
       attributes: {
         exclude: ['password'],
       },
+      include: UserDetail,
     },
   });
   return friends.map((el) => el.RequestTo);
@@ -100,8 +93,8 @@ exports.findUnknown = async (id) => {
   const users = await User.findAll({
     where: { id: { [Op.notIn]: friendIds } },
     attributes: { exclude: ['password'] },
+    include: { model: UserDetail },
   });
 
   return users;
 };
-

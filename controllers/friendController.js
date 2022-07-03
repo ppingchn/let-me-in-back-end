@@ -1,12 +1,186 @@
 const { Op } = require('sequelize');
-const { Friend, User, Follow } = require('../models');
+const { Friend, User, Follow, UserDetail } = require('../models');
 const { FRIEND_ACCEPTED, FRIEND_PENDING } = require('../config/constants');
 const FriendService = require('../service/friendsService');
 const createError = require('../util/createError');
+const e = require('express');
+
+exports.getAllUserByLetter = async (req, res, next) => {
+  try {
+    const { letter, sort } = req.query;
+    // console.log(letter);
+    // console.log(typeof letter);
+    // console.log(sort);
+
+    if (sort?.toUpperCase() === 'RECENTLY ADDED') {
+      const friends = await Friend.findAll({
+        where: {
+          [Op.or]: [
+            { requestToId: req.user.id },
+            { requestFromId: req.user.id },
+          ],
+          status: FRIEND_ACCEPTED,
+        },
+        order: [['updatedAt', 'ASC']],
+      });
+      // console.log(friends);
+
+      const friendIds = friends.map((el) =>
+        el.requestToId === req.user.id ? el.requestFromId : el.requestToId,
+      );
+
+      let  usersNotSort
+
+      // if (letter) {
+      //    usersNotSort = await User.findAll({
+      //     where: { id: friendIds },
+      //     attributes: { exclude: ['password'] },
+      //     include: {
+      //       model: UserDetail,
+      //       where: {
+      //         [Op.or]: [
+      //           { firstName: { [Op.like]: letter } },
+      //           { lastName: { [Op.like]: letter } },
+      //         ],
+      //       },
+      //       limit: 10,
+      //     },
+      //   });
+      // } else {
+         usersNotSort = await User.findAll({
+          where: { id: friendIds },
+          attributes: { exclude: ['password'] },
+          include: {
+            model: UserDetail,
+          },
+        });
+      // }
+
+      let usersNoSearch = [];
+
+      for (let i = 0; i < friendIds.length; i++) {
+        console.log(friendIds[i]);
+        const tmp = usersNotSort.filter((el) => el.id === friendIds[i]);
+        usersNoSearch.push(...tmp);
+      }
+
+      let users;
+
+      if (letter) {
+        users = usersNoSearch.filter((el) =>
+        el.UserDetails[0].firstName
+          .toUpperCase()
+          .includes(letter.toUpperCase()) ||
+          el.UserDetails[0].lastName
+          .toUpperCase()
+          .includes(letter.toUpperCase())
+      );
+        // users = usersNoSearch.filter((el) => el.UserDetails.length > 0);
+      } else {
+        users = usersNoSearch;
+      }
+
+  
+
+      res.json({ users });
+    } else if (sort?.toUpperCase() === 'FIRST NAME') {
+      console.log('qwerettyrty================', letter.toUpperCase());
+      const friends = await Friend.findAll({
+        where: {
+          [Op.or]: [
+            { requestToId: req.user.id },
+            { requestFromId: req.user.id },
+          ],
+          status: FRIEND_ACCEPTED,
+        },
+      });
+      // console.log(friends);
+
+      const friendIds = friends.map((el) =>
+        el.requestToId === req.user.id ? el.requestFromId : el.requestToId,
+      );
+
+      const usersNotSort = await User.findAll({
+        where: { id: friendIds },
+        attributes: { exclude: ['password'] },
+        include: {
+          model: UserDetail,
+        },
+      });
+
+      const usersA = usersNotSort.sort((a, b) => {
+        const firstNameA = a.UserDetails[0].firstName.toUpperCase();
+        const firstNameB = b.UserDetails[0].firstName.toUpperCase();
+        if (firstNameA < firstNameB) {
+          return -1;
+        }
+        if (firstNameA > firstNameB) {
+          return 1;
+        }
+        return 0;
+      });
+      // console.log(usersA)
+
+      const users = usersA.filter((el) =>
+        el.UserDetails[0].firstName
+          .toUpperCase()
+          .includes(letter.toUpperCase()),
+      );
+      // console.log(users)
+
+      res.json({ users });
+    } else if (sort?.toUpperCase() === 'LAST NAME') {
+      const friends = await Friend.findAll({
+        where: {
+          [Op.or]: [
+            { requestToId: req.user.id },
+            { requestFromId: req.user.id },
+          ],
+          status: FRIEND_ACCEPTED,
+        },
+      });
+      // console.log(friends);
+
+      const friendIds = friends.map((el) =>
+        el.requestToId === req.user.id ? el.requestFromId : el.requestToId,
+      );
+
+      const usersNotSort = await User.findAll({
+        where: { id: friendIds },
+        attributes: { exclude: ['password'] },
+        include: {
+          model: UserDetail,
+        },
+      });
+
+      const usersA = usersNotSort.sort((a, b) => {
+        const lastNameA = a.UserDetails[0].lastName.toUpperCase();
+        const lastNameB = b.UserDetails[0].lastName.toUpperCase();
+        if (lastNameA < lastNameB) {
+          return -1;
+        }
+        if (lastNameA > lastNameB) {
+          return 1;
+        }
+        return 0;
+      });
+
+      const users = usersA.filter((el) =>
+        el.UserDetails[0].lastName.toUpperCase().includes(letter.toUpperCase()),
+      );
+
+      res.json({ users });
+    } else {
+    }
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.getAllFriend = async (req, res, next) => {
   try {
     const { status } = req.query;
+    console.log(status);
     let users = [];
     if (status?.toUpperCase() === 'UNKNOWN') {
       // **** FIND UNKNOWN
@@ -79,7 +253,7 @@ exports.findFriendId = async (req, res, next) => {
 
 exports.requestFriend = async (req, res, next) => {
   try {
-    const { requestToId } = req.body;
+    const { requestToId } = req.params;
 
     if (req.user.id === +requestToId) {
       createError('cannot request yourself', 400);
@@ -152,9 +326,16 @@ exports.updateFriend = async (req, res, next) => {
 
 exports.deleteFriend = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { requestFromId } = req.params;
 
-    const friend = await Friend.findOne({ where: { id } });
+    const friend = await Friend.findOne({
+      where: {
+        [Op.or]: [
+          { requestFromId, requestToId: req.user.id },
+          { requestFromId: req.user.id, requestToId: requestFromId },
+        ],
+      },
+    });
 
     if (!friend) {
       createError('friend request not found', 400);
