@@ -188,7 +188,7 @@ exports.getUserPost = async (req, res, next) => {
     // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
     const posts = await Post.findAll({
       where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
-      order: [['updatedAt', 'DESC']],
+      order: [['createdAt', 'DESC']],
       attributes: {
         exclude: ['userId'],
       },
@@ -221,6 +221,27 @@ exports.getUserPost = async (req, res, next) => {
           include: [
             {
               model: Reply,
+              include: [
+                {
+                  model: User,
+                  attributes: {
+                    exclude: [
+                      'password',
+                      'email',
+                      'phoneNumber',
+                      'coverPhoto',
+                      'country',
+                      'houseNumber',
+                      'subDistrict',
+                      'district',
+                      'province',
+                      'postCode',
+                      'location',
+                      'createdAt',
+                    ],
+                  },
+                },
+              ],
             },
             {
               model: User,

@@ -56,7 +56,8 @@ exports.createExperience = async (req, res, next) => {
 
 exports.updateExperience = async (req, res, next) => {
   try {
-    const { companyName, position, yearStart, yearEnd, userId } = req.body;
+    const { companyName, position, yearStart, yearEnd, workDescription } =
+      req.body;
     const { experienceId } = req.params;
     console.log(experienceId);
     const experience = await Experience.findOne({
@@ -65,7 +66,7 @@ exports.updateExperience = async (req, res, next) => {
     if (!experience) {
       createError('Experience not found');
     }
-    bodyUpdate = { companyName, position, yearStart, yearEnd };
+    bodyUpdate = { companyName, position, yearStart, yearEnd, workDescription };
     await experience.update(bodyUpdate);
     res.json({ experience });
   } catch (error) {

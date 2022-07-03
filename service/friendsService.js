@@ -37,6 +37,7 @@ exports.findAcceptedFriend = async (id) => {
   return users;
 };
 
+// find another send request to me
 exports.findPendingFriend = async (id) => {
   const friends = await Friend.findAll({
     where: {
@@ -65,6 +66,7 @@ exports.findPendingFriend = async (id) => {
   return friends.map((el) => el.RequestFrom);
 };
 
+//find I requested to other and they didnt accept
 exports.findRequestFriend = async (id) => {
   const friends = await Friend.findAll({
     where: {
