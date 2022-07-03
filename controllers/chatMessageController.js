@@ -1,36 +1,47 @@
-const express = require("express");
-const createError = require("../utils/createError");
-const ChatMessage = require("../models");
-exports.createChatMessage = async (req, res, next) => {
+const express = require('express');
+const createError = require('../util/createError');
+const { ChatMessage, User } = require('../models');
+const { Socket } = require('../util/socket');
+
+exports.listChatMessageController = async (req, res, next) => {
   try {
-    const { senderId, resiveId, message } = req.body;
-    const chatMessage = await ChatMessage.create({
-      senderId,
-      resiveId,
-      message,
+    const { chatRoomId } = req.params;
+
+    const listMessages = await ChatMessage.findAll({
+      where: { chatRoomId },
+      include: [
+        {
+          as: 'Sender',
+          model: User,
+          attributes: {
+            exclude: ['password'],
+          },
+        },
+      ],
     });
+    res.status(200).json(listMessages);
   } catch (error) {
     next(error);
   }
 };
 
-exports.updateChatMessage = async (req, res, next) => {
+exports.createChatMessage = async (req, res, next) => {
   try {
-    const { senderId, resiveId, message } = req.body;
-    const { chatMessageId } = req.params;
-    const chatMessage = await ChatMessage.findOne({
-      where: { id: chatMessageId },
+    const { chatRoomId } = req.params;
+
+    const { message } = req.body;
+    const chatMessage = await ChatMessage.create({
+      senderId: req.user.id,
+      chatRoomId,
+      message,
     });
-    if (!chatMessage) {
-      createError("Chat Message not found", 404);
-    }
-    bodyUpdate = { message };
-    await chatMessage.update(bodyUpdate);
-    res.json({ chatMessage });
+    Socket.emit('chat', {});
+    res.status(201).json({ chatMessage });
   } catch (error) {
     next(error);
   }
 };
+
 exports.deleteChatMessage = async (req, res, next) => {
   try {
     const { chatMessageId } = req.params;
@@ -38,7 +49,7 @@ exports.deleteChatMessage = async (req, res, next) => {
       where: { id: chatMessageId },
     });
     if (!chatMessage) {
-      createError("chat not found", 404);
+      createError('chat not found', 404);
     }
     await chatMessage.destroy();
     res.status(204).json();
