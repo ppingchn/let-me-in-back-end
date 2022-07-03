@@ -181,24 +181,6 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
-    User.hasMany(models.ChatMessage, {
-      as: 'Sender',
-      foreignKey: {
-        name: 'senderId',
-        allowNull: false,
-      },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    });
-    User.hasMany(models.ChatMessage, {
-      as: 'Receive',
-      foreignKey: {
-        name: 'receiverId',
-        allowNull: false,
-      },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    });
     User.hasMany(models.LikeComment, {
       foreignKey: {
         name: 'userId',

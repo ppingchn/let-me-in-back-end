@@ -29,17 +29,15 @@ const likeRout = require('./routes/likeRoute');
 const likeCommentRout = require('./routes/likeCommentRoute');
 const repliesCommentRoute = require('./routes/replyRoute');
 const chatMessageRoute = require('./routes/chatMessageRoute');
+const chatRoomRoute = require('./routes/chatRoomRoute');
 
 const app = express();
 
 //socket io
 const server = http.createServer(app);
 //make connection to io and config cor
-const io = socketio(server, {
-  cors: {
-    origin: '*',
-  },
-});
+const { io } = require('./util/socket');
+io.attach(server);
 
 // middleware
 app.use(cors());
@@ -81,15 +79,8 @@ app.use('/repliesComment', repliesCommentRoute);
 //chatMsg
 
 app.use('/chatMessage', chatMessageRoute);
-
-// socket io
-io.on('connection', (socket) => {
-  //create event to client
-  socket.on('chat', (payload) => {
-    console.log('what is payload', payload);
-    io.emit('chat', payload);
-  });
-});
+//chat room for keep list msg
+app.use('/chatRoom', chatRoomRoute);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

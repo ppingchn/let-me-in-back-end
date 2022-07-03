@@ -2,10 +2,15 @@ const express = require('express');
 const router = express.Router();
 const chatMessageController = require('../controllers/chatMessageController');
 const authenticate = require('../middlewares/authenticate');
-router.get('/:chatMessageId', chatMessageController.getMessage);
+
+router.get(
+  '/chatRoom/:chatRoomId',
+  authenticate,
+  chatMessageController.listChatMessageController,
+);
 
 router.post(
-  '/:receiverId',
+  '/chatRoom/:chatRoomId',
   authenticate,
   chatMessageController.createChatMessage,
 );

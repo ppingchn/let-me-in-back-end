@@ -1,16 +1,41 @@
 const express = require('express');
 const createError = require('../util/createError');
-const { ChatMessage } = require('../models');
+const { ChatMessage, User } = require('../models');
+const { Socket } = require('../util/socket');
+
+exports.listChatMessageController = async (req, res, next) => {
+  try {
+    const { chatRoomId } = req.params;
+
+    const listMessages = await ChatMessage.findAll({
+      where: { chatRoomId },
+      include: [
+        {
+          as: 'Sender',
+          model: User,
+          attributes: {
+            exclude: ['password'],
+          },
+        },
+      ],
+    });
+    res.status(200).json(listMessages);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createChatMessage = async (req, res, next) => {
   try {
-    const { receiverId } = req.params;
+    const { chatRoomId } = req.params;
 
     const { message } = req.body;
     const chatMessage = await ChatMessage.create({
       senderId: req.user.id,
-      receiverId,
+      chatRoomId,
       message,
     });
+    Socket.emit('chat', {});
     res.status(201).json({ chatMessage });
   } catch (error) {
     next(error);
@@ -28,22 +53,6 @@ exports.deleteChatMessage = async (req, res, next) => {
     }
     await chatMessage.destroy();
     res.status(204).json();
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.getMessage = async (req, res, next) => {
-  console.log('555');
-  try {
-    const { chatMessageId } = req.params;
-    const msg = await ChatMessage.findOne({
-      where: { id: chatMessageId },
-      attributes: {
-        exclude: ['createdAt', 'updatedAt', 'senderId', 'receiverId', 'id'],
-      },
-    });
-    res.status(201).json({ msg });
   } catch (error) {
     next(error);
   }
