@@ -9,19 +9,15 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
-      jobDescription: DataTypes.STRING,
+      jobDescription: DataTypes.TEXT(20000),
       deadLine: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
       },
       salary: DataTypes.STRING,
     },
     {
       underscore: true,
-    }
+    },
   );
   JobList.associate = (models) => {
     JobList.hasMany(models.JobApply, {

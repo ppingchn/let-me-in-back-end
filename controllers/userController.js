@@ -51,6 +51,20 @@ exports.getAllUserByLetter = async (req, res, next) => {
   }
 };
 
+exports.getUserByMostFollow = async (req, res, next) => {
+  try {
+    const { letter } = req.params;
+
+    const companies = await CompanyDetail.findAll({
+      where: { companyName: { [Op.like]: `%${letter}%` } },
+    });
+
+    res.json({ companies });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.getUserById = async (req, res, next) => {
   try {
     const { userId } = req.params;
