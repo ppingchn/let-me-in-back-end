@@ -32,6 +32,7 @@ exports.findAcceptedFriend = async (id) => {
   const users = await User.findAll({
     where: { id: friendIds },
     attributes: { exclude: ['password'] },
+    include: { model: UserDetail },
   });
 
   return users;
