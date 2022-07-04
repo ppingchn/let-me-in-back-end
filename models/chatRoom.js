@@ -19,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
+    ChatRoom.hasMany(models.ChatMessage, {
+      foreignKey: 'chatRoomId',
+    });
   };
   return ChatRoom;
 };

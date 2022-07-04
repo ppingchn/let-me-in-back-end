@@ -3,8 +3,7 @@ const createError = require('../util/createError');
 const {
   Follow,
   User,
-  CompanyDetail,
-  UserDetail,
+
   Post,
   Comment,
   Notification,
