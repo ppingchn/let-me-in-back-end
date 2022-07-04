@@ -1,9 +1,25 @@
-const createError = require("../utils/createError");
+const createError = require('../util/createError');
+
+const { JobType, WorkEnviroment } = require('../models');
+
 exports.createJobType = async (req, res, next) => {
   try {
     const { jobTypeName } = req.body;
-    const jobType = await JobType.create({ jobTypeName });
-    res.status(201).json({ jobType });
+
+    const findJobTypeName = await JobType.findOne({
+      where: { jobTypeName: jobTypeName.toUpperCase() },
+    });
+
+    if (findJobTypeName) {
+      req.body.jobTypeId = findJobTypeName.id;
+      next();
+    } else {
+      const jobtype = await JobType.create({
+        jobTypeName: jobTypeName.toUpperCase(),
+      });
+      req.body.jobTypeId = jobtype.id;
+      next();
+    }
   } catch (error) {
     next(error);
   }
@@ -15,7 +31,7 @@ exports.updateJobType = async (req, res, next) => {
     const { jobTypeId } = req.params;
     const jobType = await JobType.findOne({ where: { id: jobTypeId } });
     if (!jobType) {
-      createError("Job type not found", 404);
+      createError('Job type not found', 404);
     }
     bodyUpdate = {
       jobTypeName,
@@ -31,7 +47,7 @@ exports.deleteJobType = async (req, res, next) => {
     const { jobTypeId } = req.params;
     const jobType = await JobType.findOne({ where: { id: jobTypeId } });
     if (!jobType) {
-      createError("Job type not found", 404);
+      createError('Job type not found', 404);
     }
     await jobType.destroy();
     res.status(204).json({ jobType });

@@ -1,5 +1,5 @@
-const express = require("express");
-const createError = require("../utils/createError");
+const express = require('express');
+const createError = require('../util/createError');
 exports.createWorkEnvironment = async (req, res, next) => {
   try {
     const { workEnvironmentType } = req.body;
@@ -20,7 +20,7 @@ exports.updateWorkEnvironment = async (req, res, next) => {
       where: { id: workEnvironmentId },
     });
     if (!workEnvironment) {
-      createError("Work Environment not found", 404);
+      createError('Work Environment not found', 404);
     }
     bodyUpdate = { WorkEnvironmentType };
     await WorkEnvironment.update(bodyUpdate);
@@ -36,7 +36,7 @@ exports.deleteWorkEnvironment = async (req, res, next) => {
       where: { id: workEnvironmentId },
     });
     if (!workEnvironment) {
-      createError("Work environmemt not found");
+      createError('Work environmemt not found');
     }
     await workEnvironment.destroy();
     res.status(204).json({ workEnvironment });

@@ -29,7 +29,7 @@ exports.getAllNotification = async (req, res, next) => {
 
 exports.createNotification = async (req, res, next) => {
   try {
-    const { postId, commentId, jobTypeId } = req.body;
+    const { postId, commentId, jobListId } = req.body;
     const follower = await Follow.findOne({ where: id });
     console.log(follower);
     if (follower) {
@@ -37,7 +37,7 @@ exports.createNotification = async (req, res, next) => {
         userId: req.user.id,
         postId,
         commentId,
-        jobTypeId,
+        jobListId,
       });
       req.status(201).json({ notification });
     }
