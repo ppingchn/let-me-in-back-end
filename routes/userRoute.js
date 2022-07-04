@@ -11,6 +11,7 @@ router.put(
   upload.single('coverImage'),
   userController.uploadCoverImage,
 );
+router.put('/updateOverview', userController.editOverviewCompany);
 // router.get('/posts', postController.getUserPost);
 router.get('/allUserByLetter/:letter', userController.getAllUserByLetter);
 router.get('/companyByLetter/:letter', userController.getCompanyByLetter);

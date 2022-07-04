@@ -31,7 +31,7 @@ const repliesCommentRoute = require('./routes/replyRoute');
 const chatMessageRoute = require('./routes/chatMessageRoute');
 const chatRoomRoute = require('./routes/chatRoomRoute');
 const jobApplyRoute = require('./routes/jobApplyRoute');
-
+const jobListRoute = require('./routes/joblistRoute');
 
 const app = express();
 
@@ -64,6 +64,7 @@ app.use('/education', authenticate, educationRoute);
 
 //job
 app.use('/job', authenticate, jobApplyRoute);
+app.use('/jobList', authenticate, jobListRoute);
 
 //postPic
 app.use('/postPic', postPicRoute);

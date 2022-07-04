@@ -28,7 +28,7 @@ exports.listChatMessageController = async (req, res, next) => {
 exports.createChatMessage = async (req, res, next) => {
   try {
     const { chatRoomId } = req.params;
-
+    console.log(req.user.id);
     const { message } = req.body;
     const chatMessage = await ChatMessage.create({
       senderId: req.user.id,
