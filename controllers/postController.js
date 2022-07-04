@@ -35,7 +35,7 @@ exports.createPost = async (req, res, next) => {
         postId = post.id;
         result = post;
       }
-      console.log(req.files);
+
       if (req.files) {
         for (let pic of req.files) {
           const result = await cloudinary.upload(pic.path);
