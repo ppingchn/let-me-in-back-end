@@ -9,10 +9,12 @@ const {
   Comment,
   User,
   Reply,
+  Notification,
   sequelize,
 } = require('../models');
 const { post } = require('../routes/registerRoute');
 const FriendService = require('../service/friendsService');
+
 exports.createPost = async (req, res, next) => {
   try {
     let result;
@@ -35,7 +37,7 @@ exports.createPost = async (req, res, next) => {
         postId = post.id;
         result = post;
       }
-      console.log(req.files);
+
       if (req.files) {
         for (let pic of req.files) {
           const result = await cloudinary.upload(pic.path);
@@ -47,6 +49,7 @@ exports.createPost = async (req, res, next) => {
           });
         }
       }
+      await Notification.create({ PostId: postId, userId: req.user.id });
     });
     res.status(201).json(result);
   } catch (err) {

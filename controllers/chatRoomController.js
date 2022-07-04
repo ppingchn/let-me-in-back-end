@@ -1,6 +1,6 @@
 const express = require('express');
 const createError = require('../util/createError');
-const { ChatRoom, User } = require('../models');
+const { ChatRoom, User, ChatMessage } = require('../models');
 const { Op } = require('sequelize');
 
 exports.listChatRoomController = async (req, res, next) => {
@@ -24,6 +24,12 @@ exports.listChatRoomController = async (req, res, next) => {
           attributes: {
             exclude: ['password'],
           },
+        },
+        {
+          model: ChatMessage,
+          limit: 1,
+          separate: true,
+          order: [['createdAt', 'DESC']],
         },
       ],
     });

@@ -8,7 +8,9 @@ let Socket = {
   },
 };
 
-io.on('connection', function (socket) {});
+io.on('connection', function (socket) {
+  console.log('######### A user connected');
+});
 
 exports.Socket = Socket;
 exports.io = io;

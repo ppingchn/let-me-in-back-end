@@ -31,13 +31,17 @@ const repliesCommentRoute = require('./routes/replyRoute');
 const chatMessageRoute = require('./routes/chatMessageRoute');
 const chatRoomRoute = require('./routes/chatRoomRoute');
 const jobApplyRoute = require('./routes/jobApplyRoute');
+
+const notificationRoute = require('./routes/notificationRoute');
+
 const jobListRoute = require('./routes/joblistRoute');
+
 
 const app = express();
 
 //socket io
 const server = http.createServer(app);
-//make connection to io and config cor
+//make connection
 const { io } = require('./util/socket');
 io.attach(server);
 
@@ -85,8 +89,12 @@ app.use('/repliesComment', repliesCommentRoute);
 //chatMsg
 
 app.use('/chatMessage', chatMessageRoute);
+
 //chat room for keep list msg
 app.use('/chatRoom', chatRoomRoute);
+
+//notification
+app.use('/notification', authenticate, notificationRoute);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

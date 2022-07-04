@@ -1,13 +1,19 @@
 const createError = require('../util/createError');
-const { Comment } = require('../models');
+const { Comment, Notification } = require('../models');
 exports.createComment = async (req, res, next) => {
   try {
     const { title, postId } = req.body;
-
+    let commentId;
     const comment = await Comment.create({
       title,
       postId,
       userId: req.user.id,
+    });
+    commentId = comment.id;
+    await Notification.create({
+      CommentId: commentId,
+      userId: req.user.id,
+      postId,
     });
     res.status(201).json({ comment });
   } catch (error) {
@@ -29,7 +35,9 @@ exports.updateComment = async (req, res, next) => {
       createError('you have no permission', 403);
     }
     comment.title = title;
+
     await comment.save();
+
     res.json({ comment });
   } catch (error) {
     next(error);
