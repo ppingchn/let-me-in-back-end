@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       websiteLink: DataTypes.STRING,
-      overview: DataTypes.STRING,
+      overview: DataTypes.TEXT(),
       address: DataTypes.STRING,
       location: DataTypes.STRING,
     },

@@ -1,3 +1,4 @@
+const { create } = require('domain');
 const fs = require('fs');
 const { Op } = require('sequelize');
 const { User, Friend, UserDetail, CompanyDetail } = require('../models');
@@ -21,6 +22,28 @@ exports.getCompanyByLetter = async (req, res, next) => {
     });
 
     res.json({ companies });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.editOverviewCompany = async (req, res, next) => {
+  try {
+    const { overview, websiteLink } = req.body;
+    const { id } = req.user;
+
+    if (!overview && !websiteLink) {
+      createError('Overview and website link is empty.', 400);
+    }
+
+    const company = await CompanyDetail.update(
+      { overview, websiteLink },
+      {
+        where: { userId: id },
+      },
+    );
+
+    res.json({ company });
   } catch (err) {
     next(err);
   }

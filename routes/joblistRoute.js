@@ -5,6 +5,8 @@ const joblistController = require('../controllers/joblistController');
 const jobtypeController = require('../controllers/jobTypeController');
 const workEnvironmentController = require('../controllers/workEnvironmentController');
 
+router.get('/', joblistController.getAllJoblist);
+router.get('/:jobId', joblistController.getJobById);
 router.post(
   '/',
   jobtypeController.createJobType,

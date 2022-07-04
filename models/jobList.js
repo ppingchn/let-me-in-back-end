@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
-      jobDescription: DataTypes.TEXT(20000),
+      jobDescription: DataTypes.TEXT(),
       deadLine: {
         type: DataTypes.DATEONLY,
       },

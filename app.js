@@ -33,7 +33,6 @@ const chatRoomRoute = require('./routes/chatRoomRoute');
 const jobApplyRoute = require('./routes/jobApplyRoute');
 const jobListRoute = require('./routes/joblistRoute');
 
-
 const app = express();
 
 //socket io
