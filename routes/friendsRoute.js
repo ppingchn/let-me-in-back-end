@@ -3,12 +3,12 @@ const express = require('express');
 const router = express.Router();
 const friendController = require('../controllers/friendController');
 
+router.get('/allUserByLetter', friendController.getAllUserByLetter);
 router.get('/', friendController.getAllFriend);
 router.get('/:id', friendController.findFriendId);
-router.post('/', friendController.requestFriend);
+router.post('/:requestToId', friendController.requestFriend);
 router.patch('/:requestFromId', friendController.updateFriend);
 
-//friendId
-router.delete('/:id', friendController.deleteFriend);
+router.delete('/:requestFromId', friendController.deleteFriend);
 
 module.exports = router;
