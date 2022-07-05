@@ -1,6 +1,12 @@
 const express = require('express');
 const createError = require('../util/createError');
-const { Follow, User, CompanyDetail, UserDetail } = require('../models');
+const {
+  Follow,
+  User,
+  CompanyDetail,
+  UserDetail,
+  Notification,
+} = require('../models');
 const { Op } = require('sequelize');
 
 exports.getAllFollowing = async (req, res, next) => {
@@ -136,7 +142,7 @@ exports.getFollowById = async (req, res, next) => {
 exports.createFollows = async (req, res, next) => {
   try {
     const { id } = req.body;
-
+    let followId;
     const follower = await User.findOne({
       where: { id },
     });
@@ -155,6 +161,12 @@ exports.createFollows = async (req, res, next) => {
           userId: req.user.id,
           companyId: id,
         });
+        followId = follow.id;
+        await Notification.create({
+          FollowId: followId,
+          userId: req.user.id,
+        });
+
         res.status(201).json({ follow });
       }
     }

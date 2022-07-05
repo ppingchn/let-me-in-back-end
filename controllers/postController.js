@@ -9,10 +9,12 @@ const {
   Comment,
   User,
   Reply,
+  Notification,
   sequelize,
 } = require('../models');
 const { post } = require('../routes/registerRoute');
 const FriendService = require('../service/friendsService');
+
 exports.createPost = async (req, res, next) => {
   try {
     let result;
@@ -35,7 +37,7 @@ exports.createPost = async (req, res, next) => {
         postId = post.id;
         result = post;
       }
-      console.log(req.files);
+
       if (req.files) {
         for (let pic of req.files) {
           const result = await cloudinary.upload(pic.path);
@@ -47,6 +49,7 @@ exports.createPost = async (req, res, next) => {
           });
         }
       }
+      await Notification.create({ PostId: postId, userId: req.user.id });
     });
     res.status(201).json(result);
   } catch (err) {
@@ -316,6 +319,299 @@ exports.getUserPost = async (req, res, next) => {
         },
       ],
     });
+    res.json({ posts });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getUserPostByPage = async (req, res, next) => {
+  try {
+    const userId = await FriendService.findFriendId(req.user.id);
+    userId.push(req.user.id);
+    const { page, limit } = req.query;
+    const offset = +page * limit;
+    console.log(page, limit, offset);
+
+    // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
+    const posts = await Post.findAll({
+      where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
+      order: [['createdAt', 'DESC']],
+      attributes: {
+        exclude: ['userId'],
+      },
+      include: [
+        { model: PostPicture },
+        {
+          model: User,
+          attributes: {
+            exclude: [
+              'password',
+              'email',
+              'phoneNumber',
+              'coverPhoto',
+              'country',
+              'houseNumber',
+              'subDistrict',
+              'district',
+              'province',
+              'postCode',
+              'location',
+              'createdAt',
+            ],
+          },
+        },
+        {
+          model: Comment,
+          attributes: {
+            exclude: ['createdAt', 'userId'],
+          },
+          include: [
+            {
+              model: Reply,
+              include: [
+                {
+                  model: User,
+                  attributes: {
+                    exclude: [
+                      'password',
+                      'email',
+                      'phoneNumber',
+                      'coverPhoto',
+                      'country',
+                      'houseNumber',
+                      'subDistrict',
+                      'district',
+                      'province',
+                      'postCode',
+                      'location',
+                      'createdAt',
+                    ],
+                  },
+                },
+              ],
+            },
+            {
+              model: User,
+              attributes: {
+                exclude: [
+                  'password',
+                  'email',
+                  'phoneNumber',
+                  'coverPhoto',
+                  'country',
+                  'houseNumber',
+                  'subDistrict',
+                  'district',
+                  'province',
+                  'postCode',
+                  'location',
+                  'createdAt',
+                ],
+              },
+            },
+            {
+              model: LikeComment,
+              attributes: {
+                exclude: ['createdAt'],
+              },
+              include: {
+                model: User,
+                attributes: {
+                  exclude: [
+                    'password',
+                    'email',
+                    'phoneNumber',
+                    'coverPhoto',
+                    'createdAt',
+                    'country',
+                    'houseNumber',
+                    'subDistrict',
+                    'district',
+                    'province',
+                    'postCode',
+                    'location',
+                  ],
+                },
+              },
+            },
+          ],
+        },
+        {
+          model: LikePost,
+          attributes: {
+            exclude: ['createdAt'],
+          },
+          include: {
+            model: User,
+            attributes: {
+              exclude: [
+                'password',
+                'email',
+                'phoneNumber',
+                'coverPhoto',
+                'createdAt',
+                'country',
+                'houseNumber',
+                'subDistrict',
+                'district',
+                'province',
+                'postCode',
+                'location',
+              ],
+            },
+          },
+        },
+      ],
+      offset: +offset,
+      limit: +limit,
+    });
+
+    const nextPage = +page + 1;
+
+    res.json({ posts, nextPage });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getUserPost = async (req, res, next) => {
+  try {
+    const userId = await FriendService.findFriendId(req.user.id);
+    userId.push(req.user.id);
+
+    // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
+    const posts = await Post.findAll({
+      where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
+      order: [['createdAt', 'DESC']],
+      attributes: {
+        exclude: ['userId'],
+      },
+      include: [
+        { model: PostPicture },
+        {
+          model: User,
+          attributes: {
+            exclude: [
+              'password',
+              'email',
+              'phoneNumber',
+              'coverPhoto',
+              'country',
+              'houseNumber',
+              'subDistrict',
+              'district',
+              'province',
+              'postCode',
+              'location',
+              'createdAt',
+            ],
+          },
+        },
+        {
+          model: Comment,
+          attributes: {
+            exclude: ['createdAt', 'userId'],
+          },
+          include: [
+            {
+              model: Reply,
+              include: [
+                {
+                  model: User,
+                  attributes: {
+                    exclude: [
+                      'password',
+                      'email',
+                      'phoneNumber',
+                      'coverPhoto',
+                      'country',
+                      'houseNumber',
+                      'subDistrict',
+                      'district',
+                      'province',
+                      'postCode',
+                      'location',
+                      'createdAt',
+                    ],
+                  },
+                },
+              ],
+            },
+            {
+              model: User,
+              attributes: {
+                exclude: [
+                  'password',
+                  'email',
+                  'phoneNumber',
+                  'coverPhoto',
+                  'country',
+                  'houseNumber',
+                  'subDistrict',
+                  'district',
+                  'province',
+                  'postCode',
+                  'location',
+                  'createdAt',
+                ],
+              },
+            },
+            {
+              model: LikeComment,
+              attributes: {
+                exclude: ['createdAt'],
+              },
+              include: {
+                model: User,
+                attributes: {
+                  exclude: [
+                    'password',
+                    'email',
+                    'phoneNumber',
+                    'coverPhoto',
+                    'createdAt',
+                    'country',
+                    'houseNumber',
+                    'subDistrict',
+                    'district',
+                    'province',
+                    'postCode',
+                    'location',
+                  ],
+                },
+              },
+            },
+          ],
+        },
+        {
+          model: LikePost,
+          attributes: {
+            exclude: ['createdAt'],
+          },
+          include: {
+            model: User,
+            attributes: {
+              exclude: [
+                'password',
+                'email',
+                'phoneNumber',
+                'coverPhoto',
+                'createdAt',
+                'country',
+                'houseNumber',
+                'subDistrict',
+                'district',
+                'province',
+                'postCode',
+                'location',
+              ],
+            },
+          },
+        },
+      ],
+    });
+
     res.json({ posts });
   } catch (err) {
     next(err);

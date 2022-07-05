@@ -1,3 +1,4 @@
+const { create } = require('domain');
 const fs = require('fs');
 const { Op } = require('sequelize');
 const { User, Friend, UserDetail, CompanyDetail } = require('../models');
@@ -9,7 +10,52 @@ const createError = require('../util/createError');
 exports.getMe = async (req, res) => {
   const user = JSON.parse(JSON.stringify(req.user));
 
+  const userDetail = await UserDetail.findOne({ userId: user.id });
+  user.userDetail = userDetail;
   res.json({ user });
+};
+
+exports.editIntro = async (req, res, next) => {
+  try {
+    const { id } = req.user;
+    const {
+      firstName,
+      lastName,
+      houseNumber,
+      subDistrict,
+      district,
+      province,
+      country,
+      postCode,
+      email,
+    } = req.body;
+
+    const user = await User.update(
+      {
+        firstName,
+        lastName,
+        country,
+        houseNumber,
+        subDistrict,
+        district,
+        province,
+        postCode,
+        email,
+      },
+      { where: { id } },
+    );
+
+    const userDetail = await UserDetail.update(
+      { firstName, lastName },
+      {
+        where: { userId: id },
+      },
+    );
+
+    res.json({ user, userDetail });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.getCompanyByLetter = async (req, res, next) => {
@@ -21,6 +67,28 @@ exports.getCompanyByLetter = async (req, res, next) => {
     });
 
     res.json({ companies });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.editOverviewCompany = async (req, res, next) => {
+  try {
+    const { overview, websiteLink } = req.body;
+    const { id } = req.user;
+
+    if (!overview && !websiteLink) {
+      createError('Overview and website link is empty.', 400);
+    }
+
+    const company = await CompanyDetail.update(
+      { overview, websiteLink },
+      {
+        where: { userId: id },
+      },
+    );
+
+    res.json({ company });
   } catch (err) {
     next(err);
   }
@@ -46,6 +114,20 @@ exports.getAllUserByLetter = async (req, res, next) => {
     });
 
     res.json({ user, companies });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getUserByMostFollow = async (req, res, next) => {
+  try {
+    const { letter } = req.params;
+
+    const companies = await CompanyDetail.findAll({
+      where: { companyName: { [Op.like]: `%${letter}%` } },
+    });
+
+    res.json({ companies });
   } catch (err) {
     next(err);
   }

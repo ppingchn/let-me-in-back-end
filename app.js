@@ -1,6 +1,8 @@
 // Libary import
 require('dotenv').config();
 const express = require('express');
+const socketio = require('socket.io');
+const http = require('http');
 
 const cors = require('cors');
 
@@ -27,9 +29,19 @@ const commentRoute = require('./routes/commentRoute');
 const likeRout = require('./routes/likeRoute');
 const likeCommentRout = require('./routes/likeCommentRoute');
 const repliesCommentRoute = require('./routes/replyRoute');
+const chatMessageRoute = require('./routes/chatMessageRoute');
+const chatRoomRoute = require('./routes/chatRoomRoute');
 const jobApplyRoute = require('./routes/jobApplyRoute');
+const jobListRoute = require('./routes/joblistRoute');
+const notificationRoute = require('./routes/notificationRoute');
 
 const app = express();
+
+//socket io
+const server = http.createServer(app);
+//make connection
+const { io } = require('./util/socket');
+io.attach(server);
 
 // middleware
 app.use(cors());
@@ -58,6 +70,7 @@ app.use('/education', authenticate, educationRoute);
 
 //job
 app.use('/job', authenticate, jobApplyRoute);
+app.use('/jobList', authenticate, jobListRoute);
 
 //postPic
 app.use('/postPic', postPicRoute);
@@ -75,9 +88,19 @@ app.use('/likeComment', likeCommentRout);
 app.use('/repliesComment', repliesCommentRoute);
 // app.use('/follow', authenticate, followRoute);
 
+//chatMsg
+
+app.use('/chatMessage', chatMessageRoute);
+
+//chat room for keep list msg
+app.use('/chatRoom', chatRoomRoute);
+
+//notification
+app.use('/notification', authenticate, notificationRoute);
+
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
   console.log(`This server running on PORT ${process.env.PORT}`);
 });
