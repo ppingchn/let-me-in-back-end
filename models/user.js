@@ -12,52 +12,26 @@ module.exports = (sequelize, DataTypes) => {
       },
       password: {
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
+        allowNull: true,
       },
+
       country: {
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
       },
       houseNumber: {
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
       },
       subDistrict: {
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
       },
       district: {
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
       },
       province: {
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
       },
       postCode: {
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
       },
       profilePic: DataTypes.STRING,
       coverPic: DataTypes.STRING,
@@ -226,6 +200,14 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
     });
     User.hasMany(models.LikePost, {
+      foreignKey: {
+        name: 'userId',
+        allowNull: false,
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    User.hasMany(models.ResetPassword, {
       foreignKey: {
         name: 'userId',
         allowNull: false,
