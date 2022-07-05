@@ -14,7 +14,6 @@ exports.createJoblist = async (req, res, next) => {
     const { jobTypeId, workEnvironmentId, position, jobDescription, salary } =
       req.body;
     const { id } = req.user;
-    console.log(workEnvironmentId);
 
     const jobList = await JobList.create({
       companyId: id,

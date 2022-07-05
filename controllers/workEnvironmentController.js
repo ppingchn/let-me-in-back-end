@@ -1,12 +1,27 @@
-const express = require('express');
 const createError = require('../util/createError');
+
+const { WorkEnviroment } = require('../models');
+
 exports.createWorkEnvironment = async (req, res, next) => {
   try {
-    const { workEnvironmentType } = req.body;
-    const workEmveronment = await WorkEnvironment.create({
-      workEnvironmentType,
+    const { workEnviromentType } = req.body;
+
+    const findWorkEnvironment = await WorkEnviroment.findOne({
+      where: { workEnviromentType: workEnviromentType.toUpperCase() },
     });
-    res.status(201).json({ workEmveronment });
+
+    if (findWorkEnvironment) {
+      req.body.workEnvironmentId = findWorkEnvironment.id;
+      next();
+    } else {
+      const workEmveronment = await WorkEnviroment.create({
+        workEnviromentType: workEnviromentType.toUpperCase(),
+      });
+      req.body.workEnvironmentId = workEmveronment.id;
+      next();
+    }
+
+    // res.status(201).json({ workEmveronment });
   } catch (error) {
     next(error);
   }
