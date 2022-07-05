@@ -10,7 +10,6 @@ module.exports = (sequelize, DataTypes) => {
   });
   ChatMessage.associate = (models) => {
     ChatMessage.belongsTo(models.User, {
-      as: 'Sender',
       foreignKey: {
         name: 'senderId',
         allowNull: false,

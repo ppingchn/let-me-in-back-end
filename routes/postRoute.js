@@ -8,6 +8,7 @@ const postPicController = require('../controllers/postPicController');
 const { route } = require('./registerRoute');
 
 router.get('/me', authenticate, postController.getUserPost);
+router.get('/postByPage', authenticate, postController.getUserPostByPage);
 router.post(
   '/',
   upload.array('postPicArr', 5),
