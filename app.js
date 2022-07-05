@@ -36,7 +36,6 @@ const notificationRoute = require('./routes/notificationRoute');
 
 const jobListRoute = require('./routes/joblistRoute');
 
-
 const app = express();
 
 //socket io
