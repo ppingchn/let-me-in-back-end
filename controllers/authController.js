@@ -2,6 +2,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
+const jwt_decode = require("jwt-decode")
 
 const createError = require('../util/createError');
 const {
@@ -191,22 +192,6 @@ exports.register = async (req, res, next) => {
                 userId: user.id,
               }),
           );
-
-          //////////////////// DONT OPEN THIS ///////////////////////////
-          //////////////////// DONT OPEN THIS ///////////////////////////
-          //////////////////// DONT OPEN THIS ///////////////////////////
-          //////////////////// DONT OPEN THIS ///////////////////////////
-          //////////////////// DONT OPEN THIS ///////////////////////////
-          //////////////////// DONT OPEN THIS ///////////////////////////
-          // const skill = Object.values(JSON.parse(skillArray));
-
-          // skill.map(
-          //   async (el) =>
-          //     await Skill.create({
-          //       title: el.title,
-          //       userId: user.id,
-          //     }),
-          // );
         } else if (role === 'company') {
           await CompanyDetail.create({
             companyName,
@@ -216,6 +201,58 @@ exports.register = async (req, res, next) => {
             userId: user.id,
           });
         }
+        const token = createToken({ id: user.id });
+        res.status(201).json({ token });
+      }
+    });
+  } catch (err) {
+    next(err);
+  } finally {
+    if (req.files?.profilePic) {
+      fs.unlinkSync(req.files.profilePic[0].path);
+    }
+    if (req.files?.coverPic) {
+      fs.unlinkSync(req.files.coverPic[0].path);
+    }
+  }
+};
+
+exports.registerGoogle = async (req, res, next) => {
+  try {
+    let result = await sequelize.transaction(async (t) => {
+      const { token } = req.body;
+
+      console.log(token);
+      const userObject = jwt_decode(token);
+      console.log(userObject)
+      console.log(userObject.email)
+      const email = userObject.email
+      const username = userObject.sub
+      const profilePic = userObject.picture
+      const firstName = userObject.given_name
+      const lastName = userObject.family_name
+
+      const user = await User.findOne({
+        where: { [Op.or]: [{ username }, { email }] },
+      });
+
+      if (!user) {
+        const user = await User.create({
+          username,
+          profilePic,
+          role: 'user',
+          email,
+        });
+
+        await UserDetail.create({
+          firstName,
+          lastName,
+          userId: user.id,
+        });
+
+        const token = createToken({ id: user.id });
+        res.status(201).json({ token });
+      } else {
         const token = createToken({ id: user.id });
         res.status(201).json({ token });
       }

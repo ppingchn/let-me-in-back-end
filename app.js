@@ -12,6 +12,7 @@ const { sequelize } = require('./models/index');
 //import route
 const registerRoute = require('./routes/registerRoute');
 const loginRoute = require('./routes/loginRout');
+const sendEmailRoute = require('./routes/sendEmailRoute');
 const errorMiddleware = require('./middlewares/error');
 const notFoundMiddleware = require('./middlewares/notFound');
 const authenticate = require('./middlewares/authenticate');
@@ -39,6 +40,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/login', loginRoute);
 app.use('/register', registerRoute);
 app.use('/users', authenticate, userRoute);
+
+//send email (forgot password)
+app.use('/sendEmail',sendEmailRoute)
+
 // app.use('/follow', authenticate, followRoute);
 app.use('/follow', authenticate, followRoute);
 

@@ -13,4 +13,6 @@ router.post(
   authController.register
 );
 
+router.post("/google",authController.registerGoogle)
+
 module.exports = router;

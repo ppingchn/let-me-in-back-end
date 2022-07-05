@@ -19,15 +19,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       birthDate: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
       },
     },
     {
       underscore: true,
-    }
+    },
   );
   UserDetail.associate = (models) => {
     UserDetail.belongsTo(models.User, {
