@@ -6,6 +6,7 @@ const {
   CompanyDetail,
   JobType,
   WorkEnviroment,
+  Notification,
 } = require('../models');
 
 exports.createJoblist = async (req, res, next) => {
@@ -90,7 +91,7 @@ exports.createJoblist = async (req, res, next) => {
       jobDescription,
       salary,
     });
-    jobListId = jobList.id;
+    jobListId = JobList.id;
     await Notification.create({ JobListId: jobListId, userId: req.user.id });
 
     res.status(201).json({ jobList });
