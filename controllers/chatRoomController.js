@@ -1,6 +1,6 @@
 const express = require('express');
 const createError = require('../util/createError');
-const { ChatRoom, User } = require('../models');
+const { ChatRoom, User, ChatMessage } = require('../models');
 const { Op } = require('sequelize');
 
 exports.listChatRoomController = async (req, res, next) => {
@@ -25,6 +25,12 @@ exports.listChatRoomController = async (req, res, next) => {
             exclude: ['password'],
           },
         },
+        {
+          model: ChatMessage,
+          limit: 1,
+          separate: true,
+          order: [['createdAt', 'DESC']],
+        },
       ],
     });
     rooms = JSON.parse(JSON.stringify(rooms));
@@ -46,12 +52,27 @@ exports.listChatRoomController = async (req, res, next) => {
 
 exports.createChatRoomController = async (req, res, next) => {
   try {
-    const { firstUserId, secondUserId } = req.body;
-    const chatRoom = await ChatRoom.create({
-      firstUserId,
-      secondUserId,
+    const { firstUserId } = req.body;
+    const { id } = req.user;
+
+    const findRoom = await ChatRoom.findOne({
+      where: {
+        [Op.or]: [
+          { firstUserId, secondUserId: id },
+          { firstUserId: id, secondUserId: firstUserId },
+        ],
+      },
     });
-    res.status(200).json(chatRoom);
+
+    if (!findRoom) {
+      const chatRoom = await ChatRoom.create({
+        firstUserId,
+        secondUserId: id,
+      });
+      res.status(200).json({ chatRoom });
+    } else {
+      res.status(200).json({ findRoom });
+    }
   } catch (error) {
     next(error);
   }

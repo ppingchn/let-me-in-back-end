@@ -1,6 +1,12 @@
 const express = require('express');
 const createError = require('../util/createError');
-const { Follow, User, CompanyDetail, UserDetail } = require('../models');
+const {
+  Follow,
+  User,
+  CompanyDetail,
+  UserDetail,
+  Notification,
+} = require('../models');
 const { Op } = require('sequelize');
 
 exports.getAllFollowing = async (req, res, next) => {
