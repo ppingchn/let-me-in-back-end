@@ -10,7 +10,52 @@ const createError = require('../util/createError');
 exports.getMe = async (req, res) => {
   const user = JSON.parse(JSON.stringify(req.user));
 
+  const userDetail = await UserDetail.findOne({ userId: user.id });
+  user.userDetail = userDetail;
   res.json({ user });
+};
+
+exports.editIntro = async (req, res, next) => {
+  try {
+    const { id } = req.user;
+    const {
+      firstName,
+      lastName,
+      houseNumber,
+      subDistrict,
+      district,
+      province,
+      country,
+      postCode,
+      email,
+    } = req.body;
+
+    const user = await User.update(
+      {
+        firstName,
+        lastName,
+        country,
+        houseNumber,
+        subDistrict,
+        district,
+        province,
+        postCode,
+        email,
+      },
+      { where: { id } },
+    );
+
+    const userDetail = await UserDetail.update(
+      { firstName, lastName },
+      {
+        where: { userId: id },
+      },
+    );
+
+    res.json({ user, userDetail });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.getCompanyByLetter = async (req, res, next) => {
