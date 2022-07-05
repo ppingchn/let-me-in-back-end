@@ -52,12 +52,27 @@ exports.listChatRoomController = async (req, res, next) => {
 
 exports.createChatRoomController = async (req, res, next) => {
   try {
-    const { firstUserId, secondUserId } = req.body;
-    const chatRoom = await ChatRoom.create({
-      firstUserId,
-      secondUserId,
+    const { firstUserId } = req.body;
+    const { id } = req.user;
+
+    const findRoom = await ChatRoom.findOne({
+      where: {
+        [Op.or]: [
+          { firstUserId, secondUserId: id },
+          { firstUserId: id, secondUserId: firstUserId },
+        ],
+      },
     });
-    res.status(200).json(chatRoom);
+
+    if (!findRoom) {
+      const chatRoom = await ChatRoom.create({
+        firstUserId,
+        secondUserId: id,
+      });
+      res.status(200).json({ chatRoom });
+    } else {
+      res.status(200).json({ findRoom });
+    }
   } catch (error) {
     next(error);
   }

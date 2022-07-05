@@ -6,7 +6,6 @@ const {
   CompanyDetail,
   JobType,
   WorkEnviroment,
-  Notification,
 } = require('../models');
 
 exports.createJoblist = async (req, res, next) => {
@@ -14,6 +13,7 @@ exports.createJoblist = async (req, res, next) => {
     const { jobTypeId, workEnvironmentId, position, jobDescription, salary } =
       req.body;
     const { id } = req.user;
+    console.log(workEnvironmentId);
 
     const jobList = await JobList.create({
       companyId: id,
@@ -80,9 +80,8 @@ exports.createJoblist = async (req, res, next) => {
     const { jobTypeId, workEnvironmentId, position, jobDescription, salary } =
       req.body;
     const { id } = req.user;
-
+    console.log(workEnvironmentId);
     let jobListId;
-
     const jobList = await JobList.create({
       companyId: id,
       jobTypeId,
@@ -93,6 +92,7 @@ exports.createJoblist = async (req, res, next) => {
     });
     jobListId = jobList.id;
     await Notification.create({ JobListId: jobListId, userId: req.user.id });
+
     res.status(201).json({ jobList });
   } catch (error) {
     next(error);
@@ -113,7 +113,7 @@ exports.updateJoblist = async (req, res, next) => {
     const { jobListId } = req.params;
     const jobList = await JobList.findOne({ where: { id: jobListId } });
     if (!jobList) {
-      createError('Job list not found', 404);
+      createErroror('Job list not found', 404);
     }
     bodyUpdate = {
       companyId,
