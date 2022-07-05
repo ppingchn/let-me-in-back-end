@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     Notification.belongsTo(models.Post);
     Notification.belongsTo(models.Comment);
 
-    Notification.belongsTo(models.JobType);
+    Notification.belongsTo(models.JobList);
   };
   return Notification;
 };

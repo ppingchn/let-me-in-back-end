@@ -145,7 +145,7 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
- 
+
     User.hasMany(models.Friend, {
       as: 'RequestFrom',
       foreignKey: {
@@ -174,7 +174,6 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
     });
 
-   
     User.hasMany(models.JobAlert, {
       as: 'CompanyJobAlert',
       foreignKey: {

@@ -31,10 +31,8 @@ const repliesCommentRoute = require('./routes/replyRoute');
 const chatMessageRoute = require('./routes/chatMessageRoute');
 const chatRoomRoute = require('./routes/chatRoomRoute');
 const jobApplyRoute = require('./routes/jobApplyRoute');
-
-const notificationRoute = require('./routes/notificationRoute');
-
 const jobListRoute = require('./routes/joblistRoute');
+const notificationRoute = require('./routes/notificationRoute');
 
 const app = express();
 

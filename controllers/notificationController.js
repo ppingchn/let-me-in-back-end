@@ -1,46 +1,47 @@
 const express = require('express');
 const createError = require('../util/createError');
+const { followId } = require('../service/followService');
 const {
-  Follow,
   User,
 
   Post,
   Comment,
+  JobList,
   Notification,
+  UserDetail,
+  CompanyDetail,
 } = require('../models');
 
-exports.getAllNotification = async (req, res, next) => {
-  const userId = req.user.id;
-  const follow = req.follow.id;
-  if (follow) {
-    const notification = await Notification.findAll({
-      where: { id: userId },
+exports.getAllNotifications = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const followIds = await followId(userId);
+    const notifications = await Notification.findAll({
+      where: { userId: followIds },
+      order: [['updatedAt', 'DESC']],
       include: [
         {
           model: User,
           as: 'User',
           attributes: { exclude: ['password'] },
-          include: UserDetail,
+          include: [{ model: UserDetail }, { model: CompanyDetail }],
+        },
+
+        {
+          model: Post,
+          as: 'Post',
+        },
+        {
+          model: Comment,
+          as: 'Comment',
+        },
+        {
+          model: JobList,
+          as: 'JobList',
         },
       ],
     });
-  }
-};
-
-exports.createNotification = async (req, res, next) => {
-  try {
-    const { postId, commentId, jobTypeId } = req.body;
-    const follower = await Follow.findOne({ where: id });
-    console.log(follower);
-    if (follower) {
-      const notification = await Notification.create({
-        userId: req.user.id,
-        postId,
-        commentId,
-        jobTypeId,
-      });
-      req.status(201).json({ notification });
-    }
+    res.status(201).json({ notifications });
   } catch (error) {
     next(error);
   }

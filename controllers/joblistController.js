@@ -6,29 +6,30 @@ const {
   CompanyDetail,
   JobType,
   WorkEnviroment,
+  Notification,
 } = require('../models');
 
-exports.createJoblist = async (req, res, next) => {
-  try {
-    const { jobTypeId, workEnvironmentId, position, jobDescription, salary } =
-      req.body;
-    const { id } = req.user;
-    console.log(workEnvironmentId);
+// exports.createJoblist = async (req, res, next) => {
+//   try {
+//     const { jobTypeId, workEnvironmentId, position, jobDescription, salary } =
+//       req.body;
+//     const { id } = req.user;
+//     console.log(workEnvironmentId);
 
-    const jobList = await JobList.create({
-      companyId: id,
-      jobTypeId,
-      workEnviromentId: workEnvironmentId,
-      position,
-      jobDescription,
-      salary,
-    });
+//     const jobList = await JobList.create({
+//       companyId: id,
+//       jobTypeId,
+//       workEnviromentId: workEnvironmentId,
+//       position,
+//       jobDescription,
+//       salary,
+//     });
 
-    res.status(201).json({ jobList });
-  } catch (error) {
-    next(error);
-  }
-};
+//     res.status(201).json({ jobList });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 exports.getAllJoblist = async (req, res, next) => {
   try {
@@ -81,7 +82,7 @@ exports.createJoblist = async (req, res, next) => {
       req.body;
     const { id } = req.user;
     console.log(workEnvironmentId);
-
+    let JobListId;
     const jobList = await JobList.create({
       companyId: id,
       jobTypeId,
@@ -90,6 +91,8 @@ exports.createJoblist = async (req, res, next) => {
       jobDescription,
       salary,
     });
+    JobListId = jobList.id;
+    await Notification.create({ JobListId, userId: req.user.id });
 
     res.status(201).json({ jobList });
   } catch (error) {
