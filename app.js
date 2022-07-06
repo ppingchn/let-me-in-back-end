@@ -54,7 +54,7 @@ app.use('/register', registerRoute);
 app.use('/users', authenticate, userRoute);
 
 //send email (forgot password)
-app.use('/sendEmail',sendEmailRoute)
+app.use('/sendEmail', sendEmailRoute);
 
 // app.use('/follow', authenticate, followRoute);
 app.use('/follow', authenticate, followRoute);
