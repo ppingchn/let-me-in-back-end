@@ -64,11 +64,81 @@ exports.sendEmailForgotPassword = async (req, res, next) => {
       to: email, // list of receivers
       subject: 'Change Password', // Subject line
       text: 'Hello', // plain text body
-      html: `<p>Please click this link below to reset your password.</p>
-      <a href="http://localhost:3000/changePassword/${token}">http://localhost:3000/changePassword/${token}<a>
-      <img
-      src=" https://lh3.googleusercontent.com/a-/AOh14GjowlKjYkj0EQqWV0PJTq2CdHHYY5F4RUe86CcH=s96-c"
-    />`, // html body
+      html: `  <div
+      style="
+        width: 350px;
+        background-color: #3381ca;
+        border-radius: 5px;
+        padding: 10px 15px;
+        font-family: Arial;
+        text-align: center;
+      "
+    >
+      <p style="font-size: 36px; font-weight: 700; color: white">Let-me-in</p>
+      <div
+        style="
+          background-color: rgb(229 231 235);
+          width: 100%;
+          border-radius: 5px;
+          padding: 30px 30px;
+          box-sizing: border-box;
+          text-align: center;
+          color: #303030;
+        "
+      >
+        <p style="padding: 0px">Hi John wick,</p>
+        <p style="padding: 0px; margin-bottom: 40px; font-size: smaller">
+          You recently requested to reset your <br />
+          Let-me-in account password
+        </p>
+        <a
+        href="http://localhost:3000/changePassword/${token}"
+          style="
+            width: 100%;
+            padding: 15px 40px;
+            max-width: 250px;
+            border: none;
+            background-color: #3381ca;
+            border-radius: 5px;
+            color: white;
+            margin: 10px 0px;
+            text-decoration: none;
+          "
+          onMouseOver="this.style.backgroundColor='#0466BF'"
+          onMouseOut="this.style.backgroundColor='#3381ca'"
+        >
+          Reset password
+        </a>
+        <p
+          style="
+            padding: 0px;
+            margin-top: 40px;
+            font-size: 0.7rem;
+            color: #7e7e7e;
+          "
+        >
+          To receive more help on this issue, please contact our support team at
+          support.letmein.com.
+        </p>
+      </div>
+      <div style="text-align: center; margin: 20px 0px">
+        <p style="padding: 0px; margin: 0; color: white; font-size: 0.7rem">
+          Term of service
+        </p>
+        <p
+          style="
+            padding: 0px;
+            margin: 0;
+            color: white;
+            font-size: 0.7rem;
+            letter-spacing: 0.8px;
+          "
+        >
+          &copy; Let-me-in 2022
+        </p>
+      </div>
+    </div>
+    `, // html body
     };
 
     transporter.sendMail(option, (err, info) => {
