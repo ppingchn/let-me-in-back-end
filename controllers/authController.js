@@ -2,7 +2,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
-const jwt_decode = require("jwt-decode")
+const jwt_decode = require('jwt-decode');
 
 const createError = require('../util/createError');
 const {
@@ -224,6 +224,7 @@ exports.registerGoogle = async (req, res, next) => {
 
       // console.log(token);
       const userObject = jwt_decode(token);
+<<<<<<< HEAD
       // console.log(userObject)
       // console.log(userObject.email)
       const email = userObject.email
@@ -231,6 +232,15 @@ exports.registerGoogle = async (req, res, next) => {
       const profilePic = userObject.picture
       const firstName = userObject.given_name
       const lastName = userObject.family_name
+=======
+      console.log(userObject);
+      console.log(userObject.email);
+      const email = userObject.email;
+      const username = userObject.sub;
+      const profilePic = userObject.picture;
+      const firstName = userObject.given_name;
+      const lastName = userObject.family_name;
+>>>>>>> dev
 
       const user = await User.findOne({
         where: { [Op.or]: [{ username }, { email }] },

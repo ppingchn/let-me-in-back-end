@@ -1,6 +1,6 @@
 const express = require('express');
 const createError = require('../util/createError');
-const { ChatMessage, User } = require('../models');
+const { ChatMessage, User, UserDetail, CompanyDetail } = require('../models');
 const { Socket } = require('../util/socket');
 
 exports.listChatMessageController = async (req, res, next) => {
@@ -16,6 +16,7 @@ exports.listChatMessageController = async (req, res, next) => {
           attributes: {
             exclude: ['password'],
           },
+          include: [{ model: UserDetail }, { model: CompanyDetail }],
         },
       ],
     });

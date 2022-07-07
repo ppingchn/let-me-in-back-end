@@ -1,4 +1,3 @@
-
 const jwt = require('jsonwebtoken');
 const createError = require('../util/createError');
 const { User } = require('../models');
@@ -16,7 +15,7 @@ module.exports = async (req, res, next) => {
     }
 
     const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    console.log(payload)
+    // console.log(payload);
     const user = await User.findOne({
       where: { id: payload.id },
       attributes: {
