@@ -222,15 +222,15 @@ exports.registerGoogle = async (req, res, next) => {
     let result = await sequelize.transaction(async (t) => {
       const { token } = req.body;
 
-      console.log(token);
+      // console.log(token);
       const userObject = jwt_decode(token);
-      console.log(userObject);
-      console.log(userObject.email);
-      const email = userObject.email;
-      const username = userObject.sub;
-      const profilePic = userObject.picture;
-      const firstName = userObject.given_name;
-      const lastName = userObject.family_name;
+      // console.log(userObject)
+      // console.log(userObject.email)
+      const email = userObject.email
+      const username = userObject.sub
+      const profilePic = userObject.picture
+      const firstName = userObject.given_name
+      const lastName = userObject.family_name
 
       const user = await User.findOne({
         where: { [Op.or]: [{ username }, { email }] },
