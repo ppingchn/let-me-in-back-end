@@ -8,6 +8,7 @@ exports.createComment = async (req, res, next) => {
       title,
       postId,
       userId: req.user.id,
+      
     });
     commentId = comment.id;
     await Notification.create({

@@ -246,6 +246,7 @@ exports.getUserPost = async (req, res, next) => {
                       'createdAt',
                     ],
                   },
+                  include: [{ model: UserDetail }, { model: CompanyDetail }],
                 },
               ],
             },
@@ -267,6 +268,7 @@ exports.getUserPost = async (req, res, next) => {
                   'createdAt',
                 ],
               },
+              include: [{ model: UserDetail }, { model: CompanyDetail }],
             },
             {
               model: LikeComment,
@@ -291,6 +293,7 @@ exports.getUserPost = async (req, res, next) => {
                     'location',
                   ],
                 },
+                include: [{ model: UserDetail }, { model: CompanyDetail }],
               },
             },
           ],
@@ -318,6 +321,7 @@ exports.getUserPost = async (req, res, next) => {
                 'location',
               ],
             },
+            include: [{ model: UserDetail }, { model: CompanyDetail }],
           },
         },
       ],
@@ -392,6 +396,7 @@ exports.getUserPostByPage = async (req, res, next) => {
                       'createdAt',
                     ],
                   },
+                  include: [{ model: UserDetail }, { model: CompanyDetail }],
                 },
               ],
             },
@@ -413,6 +418,7 @@ exports.getUserPostByPage = async (req, res, next) => {
                   'createdAt',
                 ],
               },
+              include: [{ model: UserDetail }, { model: CompanyDetail }],
             },
             {
               model: LikeComment,
@@ -437,6 +443,7 @@ exports.getUserPostByPage = async (req, res, next) => {
                     'location',
                   ],
                 },
+                include: [{ model: UserDetail }, { model: CompanyDetail }],
               },
             },
           ],
@@ -464,6 +471,7 @@ exports.getUserPostByPage = async (req, res, next) => {
                 'location',
               ],
             },
+            include: [{ model: UserDetail }, { model: CompanyDetail }],
           },
         },
       ],
@@ -479,146 +487,146 @@ exports.getUserPostByPage = async (req, res, next) => {
   }
 };
 
-exports.getUserPost = async (req, res, next) => {
-  try {
-    const userId = await FriendService.findFriendId(req.user.id);
-    userId.push(req.user.id);
+// exports.getUserPost = async (req, res, next) => {
+//   try {
+//     const userId = await FriendService.findFriendId(req.user.id);
+//     userId.push(req.user.id);
 
-    // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
-    const posts = await Post.findAll({
-      where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
-      order: [['createdAt', 'DESC']],
-      attributes: {
-        exclude: ['userId'],
-      },
-      include: [
-        { model: PostPicture },
-        {
-          model: User,
-          attributes: {
-            exclude: [
-              'password',
-              'email',
-              'phoneNumber',
-              'coverPhoto',
-              'country',
-              'houseNumber',
-              'subDistrict',
-              'district',
-              'province',
-              'postCode',
-              'location',
-              'createdAt',
-            ],
-          },
-          include: [{ model: UserDetail }, { model: CompanyDetail }],
-        },
-        {
-          model: Comment,
-          attributes: {
-            exclude: ['createdAt', 'userId'],
-          },
-          include: [
-            {
-              model: Reply,
-              include: [
-                {
-                  model: User,
-                  attributes: {
-                    exclude: [
-                      'password',
-                      'email',
-                      'phoneNumber',
-                      'coverPhoto',
-                      'country',
-                      'houseNumber',
-                      'subDistrict',
-                      'district',
-                      'province',
-                      'postCode',
-                      'location',
-                      'createdAt',
-                    ],
-                  },
-                },
-              ],
-            },
-            {
-              model: User,
-              attributes: {
-                exclude: [
-                  'password',
-                  'email',
-                  'phoneNumber',
-                  'coverPhoto',
-                  'country',
-                  'houseNumber',
-                  'subDistrict',
-                  'district',
-                  'province',
-                  'postCode',
-                  'location',
-                  'createdAt',
-                ],
-              },
-            },
-            {
-              model: LikeComment,
-              attributes: {
-                exclude: ['createdAt'],
-              },
-              include: {
-                model: User,
-                attributes: {
-                  exclude: [
-                    'password',
-                    'email',
-                    'phoneNumber',
-                    'coverPhoto',
-                    'createdAt',
-                    'country',
-                    'houseNumber',
-                    'subDistrict',
-                    'district',
-                    'province',
-                    'postCode',
-                    'location',
-                  ],
-                },
-              },
-            },
-          ],
-        },
-        {
-          model: LikePost,
-          attributes: {
-            exclude: ['createdAt'],
-          },
-          include: {
-            model: User,
-            attributes: {
-              exclude: [
-                'password',
-                'email',
-                'phoneNumber',
-                'coverPhoto',
-                'createdAt',
-                'country',
-                'houseNumber',
-                'subDistrict',
-                'district',
-                'province',
-                'postCode',
-                'location',
-              ],
-            },
-          },
-        },
-      ],
-    });
+//     // SELECT * FROM posts WHERE userId IN (myId, friendId1, friendId2, friendId3, ...)
+//     const posts = await Post.findAll({
+//       where: { userId: userId }, // WHERE userId IN (1,2,3) => WHERE userId = 1 OR userId = 2 OR userId = 3
+//       order: [['createdAt', 'DESC']],
+//       attributes: {
+//         exclude: ['userId'],
+//       },
+//       include: [
+//         { model: PostPicture },
+//         {
+//           model: User,
+//           attributes: {
+//             exclude: [
+//               'password',
+//               'email',
+//               'phoneNumber',
+//               'coverPhoto',
+//               'country',
+//               'houseNumber',
+//               'subDistrict',
+//               'district',
+//               'province',
+//               'postCode',
+//               'location',
+//               'createdAt',
+//             ],
+//           },
+//           include: [{ model: UserDetail }, { model: CompanyDetail }],
+//         },
+//         {
+//           model: Comment,
+//           attributes: {
+//             exclude: ['createdAt', 'userId'],
+//           },
+//           include: [
+//             {
+//               model: Reply,
+//               include: [
+//                 {
+//                   model: User,
+//                   attributes: {
+//                     exclude: [
+//                       'password',
+//                       'email',
+//                       'phoneNumber',
+//                       'coverPhoto',
+//                       'country',
+//                       'houseNumber',
+//                       'subDistrict',
+//                       'district',
+//                       'province',
+//                       'postCode',
+//                       'location',
+//                       'createdAt',
+//                     ],
+//                   },
+//                 },
+//               ],
+//             },
+//             {
+//               model: User,
+//               attributes: {
+//                 exclude: [
+//                   'password',
+//                   'email',
+//                   'phoneNumber',
+//                   'coverPhoto',
+//                   'country',
+//                   'houseNumber',
+//                   'subDistrict',
+//                   'district',
+//                   'province',
+//                   'postCode',
+//                   'location',
+//                   'createdAt',
+//                 ],
+//               },
+//             },
+//             {
+//               model: LikeComment,
+//               attributes: {
+//                 exclude: ['createdAt'],
+//               },
+//               include: {
+//                 model: User,
+//                 attributes: {
+//                   exclude: [
+//                     'password',
+//                     'email',
+//                     'phoneNumber',
+//                     'coverPhoto',
+//                     'createdAt',
+//                     'country',
+//                     'houseNumber',
+//                     'subDistrict',
+//                     'district',
+//                     'province',
+//                     'postCode',
+//                     'location',
+//                   ],
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//         {
+//           model: LikePost,
+//           attributes: {
+//             exclude: ['createdAt'],
+//           },
+//           include: {
+//             model: User,
+//             attributes: {
+//               exclude: [
+//                 'password',
+//                 'email',
+//                 'phoneNumber',
+//                 'coverPhoto',
+//                 'createdAt',
+//                 'country',
+//                 'houseNumber',
+//                 'subDistrict',
+//                 'district',
+//                 'province',
+//                 'postCode',
+//                 'location',
+//               ],
+//             },
+//           },
+//         },
+//       ],
+//     });
 
-    res.json({ posts });
-  } catch (err) {
-    next(err);
-  }
-};
+//     res.json({ posts });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
