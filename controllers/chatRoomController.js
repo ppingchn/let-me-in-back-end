@@ -1,6 +1,12 @@
 const express = require('express');
 const createError = require('../util/createError');
-const { ChatRoom, User, ChatMessage } = require('../models');
+const {
+  ChatRoom,
+  User,
+  ChatMessage,
+  UserDetail,
+  CompanyDetail,
+} = require('../models');
 const { Op } = require('sequelize');
 
 exports.listChatRoomController = async (req, res, next) => {
@@ -17,6 +23,7 @@ exports.listChatRoomController = async (req, res, next) => {
           attributes: {
             exclude: ['password'],
           },
+          include: [{ model: UserDetail }, { model: CompanyDetail }],
         },
         {
           as: 'SecondUser',
@@ -24,6 +31,7 @@ exports.listChatRoomController = async (req, res, next) => {
           attributes: {
             exclude: ['password'],
           },
+          include: [{ model: UserDetail }, { model: CompanyDetail }],
         },
         {
           model: ChatMessage,

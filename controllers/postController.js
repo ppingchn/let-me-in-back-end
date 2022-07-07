@@ -11,6 +11,8 @@ const {
   Reply,
   Notification,
   sequelize,
+  UserDetail,
+  CompanyDetail,
 } = require('../models');
 const { post } = require('../routes/registerRoute');
 const FriendService = require('../service/friendsService');
@@ -215,6 +217,7 @@ exports.getUserPost = async (req, res, next) => {
               'createdAt',
             ],
           },
+          include: [{ model: UserDetail }, { model: CompanyDetail }],
         },
         {
           model: Comment,
@@ -360,6 +363,7 @@ exports.getUserPostByPage = async (req, res, next) => {
               'createdAt',
             ],
           },
+          include: [{ model: UserDetail }, { model: CompanyDetail }],
         },
         {
           model: Comment,
@@ -507,6 +511,7 @@ exports.getUserPost = async (req, res, next) => {
               'createdAt',
             ],
           },
+          include: [{ model: UserDetail }, { model: CompanyDetail }],
         },
         {
           model: Comment,

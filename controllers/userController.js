@@ -9,10 +9,21 @@ const createError = require('../util/createError');
 
 exports.getMe = async (req, res) => {
   const user = JSON.parse(JSON.stringify(req.user));
+  // console.log(user);
 
-  const userDetail = await UserDetail.findOne({ userId: user.id });
-  user.userDetail = userDetail;
-  res.json({ user });
+  if (user.role === 'user') {
+    const userDetail = await UserDetail.findOne({ where: { userId: user.id } });
+    user.userDetail = userDetail;
+    res.json({ user });
+  } else {
+    const companyDetail = await CompanyDetail.findOne({
+      where: { userId: user.id },
+    });
+    user.companyDetail = companyDetail;
+    res.json({ user });
+  }
+
+  // console.log(userDetail);
 };
 
 exports.editIntro = async (req, res, next) => {
