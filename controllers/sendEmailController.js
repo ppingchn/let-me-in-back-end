@@ -76,15 +76,13 @@ exports.sendEmailForgotPassword = async (req, res, next) => {
     >
       <p style="font-size: 36px; font-weight: 700; color: white">Let-me-in</p>
       <div
-        style="
-          background-color: rgb(229 231 235);
+        style="background-color: white;
           width: 100%;
           border-radius: 5px;
           padding: 30px 30px;
           box-sizing: border-box;
           text-align: center;
-          color: #303030;
-        "
+          color: #303030;"
       >
         <p style="padding: 0px">Hi John wick,</p>
         <p style="padding: 0px; margin-bottom: 40px; font-size: smaller">
